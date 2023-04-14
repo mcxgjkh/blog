@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>满の博客</title>
+  <style>
+    /* 设置全局字体和背景颜色 */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+    }
+
+    /* 定义文章框的样式 */
+    .post {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 20px;
+      background-color: #fff;
+    }
+
+    /* 定义文章标题的样式 */
+    .post h2 {
+      font-size: 24px;
+      margin-bottom: 5px;
+    }
+
+    /* 定义文章日期的样式 */
+    .post .date {
+      font-style: italic;
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 10px;
+    }
+
+    /* 定义文章内容的样式 */
+    .post p {
+      line-height: 1.5;
+    }
+
+    /* 定义侧边栏的样式 */
+    .sidebar {
+      border: 1px solid #ccc;
+      padding: 10px;
+      background-color: #fff;
+    }
+
+    /* 定义侧边栏小标题的样式 */
+    .sidebar h3 {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    /* 定义侧边栏链接的样式 */
+    .sidebar a {
+      color: #333;
+      text-decoration: none;
+    }
+
+    /* 定义侧边栏链接悬停时的样式 */
+    .sidebar a:hover {
+      color: #000;
+    }
+
+    /* 定义评论框的样式 */
+    .comment-form {
+      margin-top: 20px;
+    }
+
+    .comment-form label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .comment-form input[type="text"], .comment-form textarea {
+      width: 100%;
+      padding: 5px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+
+    .comment-form input[type="submit"] {
+      background-color: #333;
+      color: #fff;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    .comment {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 10px;
+      background-color: #fff;
+    }
+
+    .comment .author {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .comment .date {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 5px;
+    }
+
+    .comment .content {
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>满の博客</h1>
+    <h3>生活</h3>
+  </header>
+
+  <div class="content">
+    <div class="post">
+      <h2>生活</h2>
+      <div class="date">发布日期：2023年4月11日</div>
+      <!-- 文章内容 -->
+      <p>欢迎大家来到我的blog，在这里，我会更新关于平时的一些写代码的技巧。</p>
+
+      <!-- 评论表单 -->
+      <div class="comment-form">
+        <h3>发表评论</h3>
+        <form method="post" action="submit-comment.php">
+          <label for="name">昵称：</label>
+          <input type="text" id="name" name="name" required>
+
+          <label for="email">邮箱：</label>
+          <input type="text" id="email" name="email" required>
+
+          <label for="content">评论：</label>
+          <textarea id="content" name="content" required></textarea>
+
+          <input type="submit" value="提交评论">
+        </form>
+      </div>
+    </div>
+  </div>    
+      <!-- 评论列表 -->
+      <div class="comments">
+        <h3>评论列表</h3>
+
+        <?php
+        // 连接数据库
+        $db = new mysqli('localhost', 'username', 'password', 'database_name');
+
+        // 检查连接是否成功
+        if ($db->connect_error) {
+          die('连接数据库失败：' . $db->connect_error);
+        }
+
+        // 查询评论
+        $query = "SELECT * FROM comments ORDER BY created_at DESC";
+        $result = $db->query($query);
+
+        // 循环输出评论
+        while ($row = $result->fetch_assoc()) {
+          echo '<div class="comment">';
+          echo '<div class="author">' . $row['name'] . '</div>';
+          echo '<div class="date">' . $row['created_at'] . '</div>';
+          echo '<div class="content">' . $row['content'] . '</div>';
+          echo '</div>';
+        }
+
+        // 关闭数据库连接
+        $db->close();
+        ?>
+      </div>
+    
+    <aside class="sidebar">
+      <h3>分类</h3>
+      <ul>
+        <li><a href="https://mcxgjkh.github.io/blog/index.html">主站</a></li>
+        <li><a href="https://mcxgjkh.github.io/blog/www/jishu.html">技术</a></li>
+        <li><a href="https://mcxgjkh.github.io/blog/www/shenghuo.html">生活</a></li>
+      </ul>
+      
+      <h3>标签</h3>
+      <ul>
+        <li><a href="https://github.com/mcxgjkh/blog/blob/main/index.html">HTML主站</a></li>
+        <li><a href="https://github.com/mcxgjkh/blog/blob/main/www/jishu.html">HTML技术</a></li>
+        <li><a href="https://github.com/mcxgjkh/blog/blob/main/www/shenghuo.html">HTML生活</a></li>
+      </ul>
+    </aside>
+
+    <footer>
+      <p>本站基于Github Pages搭建</p>
+      <p>&copy; 2023 满城箫管尽开花</p>
+    </footer>
+  </body>
+</html>
