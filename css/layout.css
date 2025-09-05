@@ -723,6 +723,7 @@ details div.kira-aplayer-container div[id^='aplayer-'] div.aplayer-body div.apla
   text-align: center;
   color: #777;
   white-space: normal;
+  margin-top: 20px;
   margin-bottom: 20px;
   font-size: 12px;
 }
