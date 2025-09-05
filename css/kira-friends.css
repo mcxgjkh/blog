@@ -1,3 +1,7 @@
+.kira-name {
+  font: 16px;
+  text-align: center;
+}
 .kira-friends-friendWrapper {
   flex: 0 0 25%;
   max-width: 25%;

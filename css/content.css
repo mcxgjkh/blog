@@ -1,3 +1,7 @@
+.kira-name {
+  font: 16px;
+  text-align: center;
+}
 .kira-content {
   position: relative;
   max-width: 860px;

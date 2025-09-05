@@ -1,3 +1,7 @@
+.kira-name {
+  font: 16px;
+  text-align: center;
+}
 body {
   width: 100%;
   margin: auto !important;
@@ -85,6 +89,10 @@ figure.highlight table tbody tr td.code pre *::selection {
 }
 .kira-rainbow-fill a {
   color: #fff;
+}
+.kira-name {
+  font: 16px;
+  text-align: center;
 }
 article {
   color: #444;
@@ -581,6 +589,11 @@ details div.kira-aplayer-container div[id^='aplayer-'] div.aplayer-body div.apla
   border-radius: 50%;
   transition: transform 1.5s ease-out;
 }
+.kira-sidebar .kira-name {
+  font: 16px;
+  text-align: center;
+  margin-bottom: 20px;
+}
 .kira-sidebar .kira-count {
   display: flex;
 }
@@ -744,6 +757,10 @@ details div.kira-aplayer-container div[id^='aplayer-'] div.aplayer-body div.apla
   transition: background-color 0.3s ease;
   background-color: rgba(0,0,0,0);
 }
+.kira-name {
+  font: 16px;
+  text-align: center;
+}
 .kira-content {
   position: relative;
   max-width: 860px;
@@ -821,6 +838,10 @@ details div.kira-aplayer-container div[id^='aplayer-'] div.aplayer-body div.apla
 .kira-content::-webkit-scrollbar {
   display: none;
 }
+.kira-name {
+  font: 16px;
+  text-align: center;
+}
 .kira-right-column {
   width: 80px;
   height: 100vh;
@@ -844,6 +865,10 @@ details div.kira-aplayer-container div[id^='aplayer-'] div.aplayer-body div.apla
 }
 .kira-right-column .kira-backtotop i {
   font-size: 22px;
+}
+.kira-name {
+  font: 16px;
+  text-align: center;
 }
 .kira-post-cover {
   width: 100%;
@@ -975,6 +1000,10 @@ details div.kira-aplayer-container div[id^='aplayer-'] div.aplayer-body div.apla
   padding: 25px;
   margin: -25px;
   margin-top: 0;
+}
+.kira-name {
+  font: 16px;
+  text-align: center;
 }
 .kira-archives .tagcloud {
   margin-bottom: 13px;

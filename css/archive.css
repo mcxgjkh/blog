@@ -1,3 +1,7 @@
+.kira-name {
+  font: 16px;
+  text-align: center;
+}
 .kira-archives .tagcloud {
   margin-bottom: 13px;
   font-size: 0;

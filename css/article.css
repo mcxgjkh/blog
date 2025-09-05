@@ -1,3 +1,7 @@
+.kira-name {
+  font: 16px;
+  text-align: center;
+}
 article {
   color: #444;
   font-family: microsoft yahei;

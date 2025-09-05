@@ -24,6 +24,11 @@
   border-radius: 50%;
   transition: transform 1.5s ease-out;
 }
+.kira-sidebar .kira-name {
+  font: 16px;
+  text-align: center;
+  margin-bottom: 20px;
+}
 .kira-sidebar .kira-count {
   display: flex;
 }

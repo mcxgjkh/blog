@@ -1,3 +1,7 @@
+.kira-name {
+  font: 16px;
+  text-align: center;
+}
 .kira-right-column {
   width: 80px;
   height: 100vh;
