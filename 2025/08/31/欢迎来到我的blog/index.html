@@ -427,7 +427,7 @@
 	<script>
     // 页面加载时立即启动防护
     (function() {
-        // 密码配置 - 硬编码
+        // 密码配置 - 硬编码（不安全！仅用于演示）
         const ADMIN_PASSWORD = "homo114514";
         // 用于临时存储密码验证状态（页面刷新后失效）
         let isAdminMode = false;
@@ -531,7 +531,7 @@
                             gap: 15px;
                             margin-top: 25px;
                         ">
-                            <button onclick="handleRefresh()" style="
+                            <button id="refreshBtn" style="
                                 flex: 1;
                                 padding: 14px 20px;
                                 background: #f8f9fa;
@@ -547,7 +547,7 @@
                                 刷新页面
                             </button>
                             
-                            <button onclick="checkPassword()" style="
+                            <button id="submitBtn" style="
                                 flex: 1;
                                 padding: 14px 20px;
                                 background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
@@ -593,268 +593,229 @@
             `;
             document.head.appendChild(style);
             
-            // 监听回车键
-            document.getElementById('adminPasswordInput').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
+            // 添加按钮事件监听器
+            setTimeout(() => {
+                // 刷新按钮事件
+                document.getElementById('refreshBtn').addEventListener('click', function() {
+                    window.location.reload();
+                });
+                
+                // 确认密码按钮事件
+                document.getElementById('submitBtn').addEventListener('click', function() {
                     checkPassword();
-                }
-            });
+                });
+                
+                // 输入框回车键事件
+                document.getElementById('adminPasswordInput').addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        checkPassword();
+                    }
+                });
+                
+                // 自动聚焦到输入框
+                document.getElementById('adminPasswordInput').focus();
+            }, 100);
+        }
+        
+        // 检查密码
+        function checkPassword() {
+            const input = document.getElementById('adminPasswordInput');
+            const errorDiv = document.getElementById('passwordError');
+            const password = input.value.trim();
+            
+            // 清空错误信息
+            errorDiv.textContent = '';
+            errorDiv.style.color = '#dc3545';
+            
+            if (!password) {
+                errorDiv.textContent = '请输入密码';
+                input.style.borderColor = '#dc3545';
+                return;
             }
             
-            // 检查密码
-            function checkPassword() {
-                const input = document.getElementById('adminPasswordInput');
-                const errorDiv = document.getElementById('passwordError');
-                const password = input.value.trim();
+            if (password === ADMIN_PASSWORD) {
+                // 密码正确
+                errorDiv.textContent = '✓ 密码正确，正在关闭防护...';
+                errorDiv.style.color = '#28a745';
+                input.style.borderColor = '#28a745';
                 
-                // 清空错误信息
-                errorDiv.textContent = '';
-                errorDiv.style.color = '#dc3545';
+                // 禁用所有防护
+                disableAllProtections();
                 
-                if (!password) {
-                    errorDiv.textContent = '请输入密码';
-                    input.style.borderColor = '#dc3545';
-                    return;
-                }
-                
-                if (password === ADMIN_PASSWORD) {
-                    // 密码正确
-                    errorDiv.textContent = '✓ 密码正确，正在关闭防护...';
-                    errorDiv.style.color = '#28a745';
-                    input.style.borderColor = '#28a745';
-                    
-                    // 禁用所有防护
-                    disableAllProtections();
-                    
-                    // 显示成功信息，然后刷新页面
-                    setTimeout(() => {
-                        // 显示成功提示
-                        document.getElementById('fullscreen-warning').innerHTML = `
-                            <div style="text-align: center; padding: 50px;">
-                                <div style="font-size: 60px; color: #28a745; margin-bottom: 20px;">✓</div>
-                                <h2 style="color: #28a745; margin-bottom: 15px;">密码验证成功</h2>
-                                <p style="color: #666; margin-bottom: 25px; font-size: 18px;">
-                                    所有防护已关闭，页面即将刷新...
-                                </p>
-                                <div style="
-                                    width: 200px;
-                                    height: 4px;
-                                    background: #e0e0e0;
+                // 显示成功信息，然后刷新页面
+                setTimeout(() => {
+                    // 显示成功提示
+                    document.getElementById('fullscreen-warning').innerHTML = `
+                        <div style="text-align: center; padding: 50px;">
+                            <div style="font-size: 60px; color: #28a745; margin-bottom: 20px;">✓</div>
+                            <h2 style="color: #28a745; margin-bottom: 15px;">密码验证成功</h2>
+                            <p style="color: #666; margin-bottom: 25px; font-size: 18px;">
+                                所有防护已关闭，页面即将刷新...
+                            </p>
+                            <div style="
+                                width: 200px;
+                                height: 4px;
+                                background: #e0e0e0;
+                                border-radius: 2px;
+                                margin: 0 auto 30px;
+                                overflow: hidden;
+                            ">
+                                <div id="progressBar" style="
+                                    width: 0%;
+                                    height: 100%;
+                                    background: #28a745;
                                     border-radius: 2px;
-                                    margin: 0 auto 30px;
-                                    overflow: hidden;
-                                ">
-                                    <div id="progressBar" style="
-                                        width: 0%;
-                                        height: 100%;
-                                        background: #28a745;
-                                        border-radius: 2px;
-                                        transition: width 2s linear;
-                                    "></div>
-                                </div>
+                                    transition: width 2s linear;
+                                "></div>
                             </div>
-                        `;
-                        
-                        // 启动进度条
-                        setTimeout(() => {
-                            document.getElementById('progressBar').style.width = '100%';
-                        }, 100);
-                        
-                        // 2秒后刷新页面
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 2000);
-                    }, 1000);
-                } else {
-                    // 密码错误
-                    errorDiv.textContent = '✗ 密码错误，请重试';
-                    input.style.borderColor = '#dc3545';
-                    input.style.animation = 'shake 0.5s';
+                        </div>
+                    `;
                     
-                    // 清除输入（保留焦点）
-                    input.value = '';
-                    input.focus();
-                    
-                    // 移除抖动动画
+                    // 启动进度条
                     setTimeout(() => {
-                        input.style.animation = '';
-                    }, 500);
-                }
+                        document.getElementById('progressBar').style.width = '100%';
+                    }, 100);
+                    
+                    // 2秒后刷新页面
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                }, 1000);
+            } else {
+                // 密码错误
+                errorDiv.textContent = '✗ 密码错误，请重试';
+                input.style.borderColor = '#dc3545';
+                input.style.animation = 'shake 0.5s';
+                
+                // 清除输入（保留焦点）
+                input.value = '';
+                input.focus();
+                
+                // 移除抖动动画
+                setTimeout(() => {
+                    input.style.animation = '';
+                }, 500);
+            }
+        }
+        
+        // 刷新页面（保持原有函数，但实际不会直接调用）
+        window.handleRefresh = function() {
+            window.location.reload();
+        };
+        
+        // 禁用所有防护
+        function disableAllProtections() {
+            isAdminMode = true;
+            
+            // 移除所有事件监听器
+            document.removeEventListener('keydown', keydownHandler);
+            document.removeEventListener('contextmenu', contextmenuHandler);
+            document.removeEventListener('selectstart', selectstartHandler);
+            document.removeEventListener('dragstart', dragstartHandler);
+            window.removeEventListener('resize', resizeHandler);
+            
+            // 移除防打印
+            window.onbeforeprint = null;
+            
+            // 清除所有间隔定时器
+            const maxId = setTimeout(()=>{}, 0);
+            for (let i = 0; i < maxId; i++) {
+                clearTimeout(i);
+                clearInterval(i);
             }
             
-            // 刷新页面
-            function handleRefresh() {
-                window.location.reload();
-            }
-            
-            // 禁用所有防护
-            function disableAllProtections() {
-                isAdminMode = true;
-                
-                // 移除所有事件监听器
-                const oldKeydown = document.onkeydown;
-                const oldContextmenu = document.oncontextmenu;
-                const oldSelectstart = document.onselectstart;
-                const oldDragstart = document.ondragstart;
-                
-                document.onkeydown = null;
-                document.oncontextmenu = null;
-                document.onselectstart = null;
-                document.ondragstart = null;
-                
-                // 移除防打印
-                window.onbeforeprint = null;
-                
-                // 清除所有间隔定时器
-                const maxId = setTimeout(()=>{}, 0);
-                for (let i = 0; i < maxId; i++) {
-                    clearTimeout(i);
-                    clearInterval(i);
-                }
-                
-                // 允许选择文本
+            // 允许选择文本
+            if (document.querySelectorAll) {
                 document.querySelectorAll('.protected-content').forEach(el => {
                     el.style.userSelect = 'auto';
                     el.style.webkitUserSelect = 'auto';
                     el.style.mozUserSelect = 'auto';
                     el.style.msUserSelect = 'auto';
                 });
-                
-                console.log('所有防护已关闭');
             }
             
-            // 原有的防护代码...
-            document.addEventListener('keydown', function(e) {
-                if (isAdminMode) return;
-                
-                const blockedKeys = [
-                    'F12',
-                    'F8',
-                    'F2'
-                ];
-                
-                const blockedCombinations = [
-                    (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)),
-                    (e.metaKey && e.altKey && e.key === 'I'),
-                    (e.ctrlKey && e.key === 'u'),
-                    (e.ctrlKey && e.key === 's'),
-                    (e.ctrlKey && e.key === 'p')
-                ];
-                
-                if (blockedKeys.includes(e.key) || blockedCombinations.some(combo => combo)) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    showPasswordInput();
-                    return false;
-                }
-            });
+            console.log('所有防护已关闭');
+        }
+        
+        // 事件处理函数
+        function keydownHandler(e) {
+            if (isAdminMode) return;
             
-            document.addEventListener('contextmenu', function(e) {
-                if (isAdminMode) return;
+            const blockedKeys = [
+                'F12',
+                'F8',
+                'F2'
+            ];
+            
+            const blockedCombinations = [
+                (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)),
+                (e.metaKey && e.altKey && e.key === 'I'),
+                (e.ctrlKey && e.key === 'u'),
+                (e.ctrlKey && e.key === 's'),
+                (e.ctrlKey && e.key === 'p')
+            ];
+            
+            if (blockedKeys.includes(e.key) || blockedCombinations.some(combo => combo)) {
                 e.preventDefault();
+                e.stopPropagation();
                 showPasswordInput();
                 return false;
-            });
+            }
+        }
+        
+        function contextmenuHandler(e) {
+            if (isAdminMode) return;
+            e.preventDefault();
+            showPasswordInput();
+            return false;
+        }
+        
+        function selectstartHandler(e) {
+            if (isAdminMode) return;
+            e.preventDefault();
+            return false;
+        }
+        
+        function dragstartHandler(e) {
+            if (isAdminMode) return;
+            e.preventDefault();
+            return false;
+        }
+        
+        function resizeHandler() {
+            if (isAdminMode) return;
             
-            document.addEventListener('selectstart', function(e) {
-                if (isAdminMode) return;
-                e.preventDefault();
-                return false;
-            });
+            const newWidth = window.innerWidth;
+            const newHeight = window.innerHeight;
             
-            document.addEventListener('dragstart', function(e) {
-                if (isAdminMode) return;
-                e.preventDefault();
-                return false;
-            });
+            // 只有当窗口大小变化很小时才检查（可能是开发者工具）
+            const widthDiff = Math.abs(newWidth - lastWidth);
+            const heightDiff = Math.abs(newHeight - lastHeight);
             
-            // 改进的调试器检测 - 只在用户可能打开调试器时检测
-            function detectDevTools() {
-                const widthThreshold = 200;
-                const heightThreshold = 100;
-                
-                // 检查窗口是否被调整到不寻常的大小
-                const windowWidth = window.outerWidth - window.innerWidth;
-                const windowHeight = window.outerHeight - window.innerHeight;
-                
-                if (windowWidth > widthThreshold || windowHeight > heightThreshold) {
-                    // 可能是开发者工具打开了
-                    showPasswordInput();
-                    return true;
-                }
-                
-                // 另一种检测方法：检查控制台是否打开
-                const startTime = Date.now();
-                debugger;
-                const endTime = Date.now();
-                
-                // 如果debugger语句执行时间超过100ms，可能打开了调试器
-                if (endTime - startTime > 100) {
-                    showPasswordInput();
-                    return true;
-                }
-                
-                return false;
+            if ((widthDiff > 0 && widthDiff < 100) || 
+                (heightDiff > 0 && heightDiff < 100)) {
+                // 变化很小，可能是开发者工具
+                setTimeout(() => {
+                    if (!isAdminMode) {
+                        showPasswordInput();
+                    }
+                }, 300);
             }
             
-            // 只在特定事件后检测调试器，而不是持续检测
-            let lastDetectionTime = 0;
-            const DETECTION_COOLDOWN = 1000; // 1秒冷却时间
-            
-            function checkForDevTools() {
-                const now = Date.now();
-                if (now - lastDetectionTime < DETECTION_COOLDOWN) {
-                    return;
-                }
-                
-                if (detectDevTools()) {
-                    lastDetectionTime = now;
-                }
-            }
-            
-            // 在可能触发调试器的操作后检查
-            document.addEventListener('keydown', function(e) {
-                // 只在按下可能打开调试器的快捷键后检查
-                if (e.key === 'F12' || 
-                    (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key)) ||
-                    (e.metaKey && e.altKey && e.key === 'I')) {
-                    setTimeout(checkForDevTools, 500);
-                }
-            });
-            
-            // 定期但不太频繁地检查（每5秒一次）
-            setInterval(() => {
-                if (!isAdminMode && Math.random() < 0.1) { // 10%的概率检查
-                    checkForDevTools();
-                }
-            }, 5000);
-            
-            // 检测窗口大小变化 - 只在明显变化时检查
-            let lastWidth = window.innerWidth;
-            let lastHeight = window.innerHeight;
-            window.addEventListener('resize', function() {
-                if (isAdminMode) return;
-                
-                const newWidth = window.innerWidth;
-                const newHeight = window.innerHeight;
-                
-                // 只有当窗口大小变化很小时才检查（可能是开发者工具）
-                const widthDiff = Math.abs(newWidth - lastWidth);
-                const heightDiff = Math.abs(newHeight - lastHeight);
-                
-                if ((widthDiff > 0 && widthDiff < 100) || 
-                    (heightDiff > 0 && heightDiff < 100)) {
-                    // 变化很小，可能是开发者工具
-                    setTimeout(() => {
-                        if (!isAdminMode) {
-                            showPasswordInput();
-                        }
-                    }, 300);
-                }
-                
-                lastWidth = newWidth;
-                lastHeight = newHeight;
-            });
+            lastWidth = newWidth;
+            lastHeight = newHeight;
+        }
+        
+        // 添加事件监听器
+        document.addEventListener('keydown', keydownHandler);
+        document.addEventListener('contextmenu', contextmenuHandler);
+        document.addEventListener('selectstart', selectstartHandler);
+        document.addEventListener('dragstart', dragstartHandler);
+        
+        // 检测窗口大小变化 - 只在明显变化时检查
+        let lastWidth = window.innerWidth;
+        let lastHeight = window.innerHeight;
+        window.addEventListener('resize', resizeHandler);
 
         })();
 
@@ -869,7 +830,7 @@
                 return false;
             };
             
-            // 防快捷键
+            // 防PrintScreen快捷键
             document.addEventListener('keydown', function(e) {
                 // 屏蔽 Print Screen
                 if (e.key === 'PrintScreen') {
