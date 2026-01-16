@@ -54,6 +54,223 @@
 	<meta name="generator" content="Hexo 7.3.0"></head>
 
 	<style>
+        /* 用户协议弹窗样式 */
+		#user-agreement-modal {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(0, 0, 0, 0.85);
+			z-index: 9999999;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			font-family: system-ui, -apple-system, sans-serif;
+			backdrop-filter: blur(5px);
+		}
+		
+		.agreement-container {
+			background: white;
+			border-radius: 20px;
+			width: 90%;
+			max-width: 800px;
+			max-height: 85vh;
+			overflow: hidden;
+			box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+			animation: slideUp 0.5s ease;
+		}
+		
+		.agreement-header {
+			background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+			color: white;
+			padding: 25px 30px;
+			text-align: center;
+		}
+		
+		.agreement-header h1 {
+			font-size: 28px;
+			margin: 0 0 8px 0;
+			font-weight: 600;
+		}
+		
+		.agreement-header p {
+			opacity: 0.9;
+			font-size: 14px;
+			margin: 0;
+		}
+		
+		.agreement-content {
+			padding: 30px;
+			max-height: 50vh;
+			overflow-y: auto;
+			line-height: 1.6;
+			color: #333;
+		}
+		
+		.agreement-content h2 {
+			color: #2c3e50;
+			margin: 25px 0 15px 0;
+			font-size: 20px;
+			padding-bottom: 8px;
+			border-bottom: 2px solid #f0f0f0;
+		}
+		
+		.agreement-content h3 {
+			color: #34495e;
+			margin: 20px 0 10px 0;
+			font-size: 16px;
+		}
+		
+		.agreement-content p {
+			margin-bottom: 15px;
+			text-align: justify;
+		}
+		
+		.agreement-content ul {
+			margin: 15px 0 15px 25px;
+		}
+		
+		.agreement-content li {
+			margin-bottom: 10px;
+			position: relative;
+		}
+		
+		.agreement-content li:before {
+			content: "•";
+			color: #4b6cb7;
+			font-weight: bold;
+			position: absolute;
+			left: -15px;
+		}
+		
+		.warning-box {
+			background: #fff9e6;
+			border-left: 4px solid #ffc107;
+			padding: 18px;
+			margin: 20px 0;
+			border-radius: 8px;
+		}
+		
+		.terms-scroll {
+			border: 2px solid #e0e0e0;
+			border-radius: 10px;
+			padding: 20px;
+			margin: 20px 0;
+			max-height: 250px;
+			overflow-y: auto;
+			background: #f9f9f9;
+			font-size: 14px;
+		}
+		
+		.agreement-footer {
+			padding: 25px 30px;
+			background: #f8f9fa;
+			border-top: 1px solid #eaeaea;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 20px;
+		}
+		
+		.agreement-checkbox {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			cursor: pointer;
+		}
+		
+		.agreement-checkbox input[type="checkbox"] {
+			width: 20px;
+			height: 20px;
+			cursor: pointer;
+		}
+		
+		.agreement-checkbox label {
+			font-size: 15px;
+			color: #555;
+			cursor: pointer;
+			user-select: none;
+		}
+		
+		.agreement-checkbox a {
+			color: #4b6cb7;
+			text-decoration: none;
+			font-weight: 500;
+		}
+		
+		.agreement-checkbox a:hover {
+			text-decoration: underline;
+		}
+		
+		.agreement-buttons {
+			display: flex;
+			gap: 15px;
+		}
+		
+		.agreement-btn {
+			padding: 14px 32px;
+			border-radius: 10px;
+			border: none;
+			font-size: 16px;
+			font-weight: 500;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			min-width: 140px;
+		}
+		
+		.btn-disagree {
+			background: #f8f9fa;
+			color: #666;
+			border: 2px solid #ddd;
+		}
+		
+		.btn-disagree:hover {
+			background: #e9ecef;
+			border-color: #ccc;
+			transform: translateY(-2px);
+		}
+		
+		.btn-agree {
+			background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+			color: white;
+		}
+		
+		.btn-agree:hover:not(:disabled) {
+			transform: translateY(-2px);
+			box-shadow: 0 8px 20px rgba(75, 108, 183, 0.3);
+		}
+		
+		.btn-agree:disabled {
+			background: #cccccc;
+			cursor: not-allowed;
+			transform: none;
+			box-shadow: none;
+		}
+		
+		.remember-choice {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			margin-top: 10px;
+		}
+		
+		.remember-choice label {
+			font-size: 14px;
+			color: #666;
+		}
+		
+		/* 动画 */
+		@keyframes slideUp {
+			from { opacity: 0; transform: translateY(50px); }
+			to { opacity: 1; transform: translateY(0); }
+		}
+		
+		@keyframes fadeOut {
+			from { opacity: 1; }
+			to { opacity: 0; }
+		}
+
 		@media print {
 			body * {
 				visibility: hidden !important;
@@ -82,12 +299,94 @@
 	</style>
 
 	<body>
-		<div class="protected-content">
-			<div
-				class="kira-background"
-				style="background-image: url('https://blog.mcxgjkh.dpdns.org/images/头图.jpg')"
-			></div>
-			<div class="kira-header">
+        <!-- 用户协议弹窗 -->
+		<div id="user-agreement-modal">
+			<div class="agreement-container">
+				<div class="agreement-header">
+					<h1>用户协议与隐私政策</h1>
+					<p>请仔细阅读并同意以下条款以继续访问</p>
+				</div>
+				
+				<div class="agreement-content">
+					<div class="warning-box">
+						<strong>重要提示：</strong> 在访问和使用本网站前，请您务必仔细阅读并充分理解全部条款。
+					</div>
+					
+					<h2>一、服务条款</h2>
+					<p>1. 您理解并同意，本网站提供的所有内容（包括但不限于文字、图片、音频、视频等）受《中华人民共和国著作权法》及相关法律法规保护。</p>
+					<p>2. 未经本网站明确书面授权，任何单位或个人不得以任何方式复制、转载、链接、抓取或以其他方式使用本网站的任何内容。</p>
+					<p>3. 本网站保留随时修改、暂停或终止服务的权利，无需事先通知用户。</p>
+					
+					<h2>二、用户行为规范</h2>
+					<p>在使用本网站服务时，您同意遵守以下规定：</p>
+					<ul>
+						<li><strong>禁止未经授权的复制行为：</strong>包括但不限于截图、录屏、拍照、打印等</li>
+						<li><strong>禁止未经授权的传播行为：</strong>禁止以任何形式传播、分享、出售本网站内容</li>
+						<li><strong>禁止技术攻击行为：</strong>禁止使用爬虫、自动化工具获取内容</li>
+						<li><strong>遵守法律法规：</strong>不得利用本网站从事任何违法活动</li>
+					</ul>
+					
+					<h2>三、内容保护声明</h2>
+					<p>为保护内容安全，本网站已采取以下技术措施：</p>
+					<ul>
+						<li>页面内容保护技术，防止未经授权的复制</li>
+						<li>访问行为监控和分析系统</li>
+						<li>数字水印技术（如适用）</li>
+						<li>完整的行为审计日志</li>
+					</ul>
+					
+					<h2>四、隐私政策</h2>
+					<p>我们尊重并保护您的隐私权，仅收集必要的访问信息：</p>
+					<ul>
+						<li>为提供基础服务所需的必要信息</li>
+						<li>用于安全防护和异常检测的信息</li>
+						<li>用于优化用户体验的匿名化数据</li>
+					</ul>
+					
+					<h2>五、责任限制</h2>
+					<p>1. 对于因不可抗力或非本网站原因造成的服务中断或数据丢失，本网站不承担责任。</p>
+					<p>2. 您应对使用本网站服务的行为自行承担风险。</p>
+					
+					<div class="terms-scroll">
+						<h3>完整法律条款摘要</h3>
+						<p>1. 本协议构成您与本网站之间的完整协议，取代任何先前或同期的口头或书面协议。</p>
+						<p>2. 本网站保留随时修改本协议的权力，修改后的协议将在网站上公布。</p>
+						<p>3. 如您不同意本协议的任何条款，应立即停止使用本服务。</p>
+						<p>4. 本协议受中华人民共和国法律管辖，任何争议应提交有管辖权的人民法院诉讼解决。</p>
+						<p>5. 违反本协议的行为可能导致您的访问权限被立即终止，并可能承担相应的法律责任。</p>
+					</div>
+				</div>
+				
+				<div class="agreement-footer">
+					<div>
+						<div class="agreement-checkbox">
+							<input type="checkbox" id="agreeCheckbox">
+							<label for="agreeCheckbox">
+								我已阅读、理解并同意
+							</label>
+						</div>
+						<div class="remember-choice">
+							<input type="checkbox" id="rememberCheckbox">
+							<label for="rememberCheckbox">7天内不再显示此协议</label>
+						</div>
+					</div>
+					
+					<div class="agreement-buttons">
+						<button class="agreement-btn btn-disagree" id="disagreeBtn">不同意</button>
+						<button class="agreement-btn btn-agree" id="agreeBtn" disabled>同意并继续</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<!-- 网站主内容（默认隐藏） -->
+		<div id="main-content" style="display: none;">
+            <div class="protected-content">
+                <div
+                    class="kira-background"
+                    style="background-image: url('https://blog.mcxgjkh.dpdns.org/images/头图.jpg')"
+                ></div>
+                <div class="kira-header">
     <a
         class="kira-drawer-button mdui-ripple"
         title="导航栏"
@@ -102,8 +401,8 @@
 		/>
     </a>
 </div>
-			<div class="kira-body">
-				<div class="kira-sidebar" id="sidebar">
+                <div class="kira-body">
+                    <div class="kira-sidebar" id="sidebar">
 	<div class="kira-avatar mdui-ripple">
 		<a href="https://blog.mcxgjkh.dpdns.org/images/头像.png" title="MCXGJKH">
 			<img
@@ -298,10 +597,10 @@
 		document.querySelector('.kira-sidebar.show#sidebar').classList.remove('show');
 	})(this)"
 ></div>
-				<div class="kira-content">
-					<div id="kira-top-header"></div>
-					<div class="kira-main-content">
-						
+                    <div class="kira-content">
+                        <div id="kira-top-header"></div>
+                        <div class="kira-main-content">
+                            
 <link rel="stylesheet" href="/css/kira-image.css">
 
 
@@ -429,9 +728,9 @@
 	
 </div>
 
-					</div>
-				</div>
-				<div class="kira-right-column">
+                        </div>
+                    </div>
+                    <div class="kira-right-column">
 	<a onclick="document.querySelector('#kira-top-header').scrollIntoView({behavior: 'smooth'});" class="kira-backtotop" aria-label="回到顶部" title="回到顶部">
 		<button class="mdui-fab mdui-ripple">
 			<i class="kirafont icon-caret-up"></i>
@@ -439,97 +738,245 @@
 	</a>
 </div>
 
-			</div>
-		</div>
+                </div>
+            </div>
+        </div>
 	</body>
 
 	<script>
-    // 页面加载时立即检查防护状态
-    (function() {
-        // 密码配置
-        const ADMIN_PASSWORD = "homo114514";
-        const PROTECTION_EXPIRY_KEY = "protection_expiry";
-        
-        // 检查是否在有效期内（只在页面加载时调用一次）
-        function isWithinProtectionWindow() {
-            const expiry = localStorage.getItem(PROTECTION_EXPIRY_KEY);
+        // 用户协议管理
+		(function() {
+			// 存储键名
+			const AGREEMENT_KEY = 'user_agreement_accepted';
+			const REMEMBER_KEY = 'agreement_remember_days';
+			const TIMESTAMP_KEY = 'agreement_timestamp';
+			
+			// 检查是否应该显示协议
+			function shouldShowAgreement() {
+				// 检查是否已同意
+				const agreed = localStorage.getItem(AGREEMENT_KEY);
+				if (agreed !== 'true') {
+					return true; // 从未同意过，需要显示
+				}
+				
+				// 检查是否选择了记住
+				const remember = localStorage.getItem(REMEMBER_KEY);
+				if (remember === 'true') {
+					const timestamp = localStorage.getItem(TIMESTAMP_KEY);
+					if (timestamp) {
+						const agreedTime = parseInt(timestamp);
+						const currentTime = Date.now();
+						const daysPassed = (currentTime - agreedTime) / (1000 * 60 * 60 * 24);
+						
+						// 如果在7天内，不显示协议
+						if (daysPassed <= 7) {
+							return false;
+						}
+					}
+				}
+				
+				// 默认每次都需要显示（除非选择了记住且在有效期内）
+				return true;
+			}
+			
+			// 显示协议弹窗
+			function showAgreement() {
+				document.getElementById('user-agreement-modal').style.display = 'flex';
+				document.getElementById('main-content').style.display = 'none';
+				
+				// 绑定事件
+				setTimeout(() => {
+					// 协议复选框
+					const agreeCheckbox = document.getElementById('agreeCheckbox');
+					const agreeBtn = document.getElementById('agreeBtn');
+					
+					agreeCheckbox.addEventListener('change', function() {
+						agreeBtn.disabled = !this.checked;
+					});
+					
+					// 同意按钮
+					document.getElementById('agreeBtn').addEventListener('click', function() {
+						acceptAgreement();
+					});
+					
+					// 不同意按钮
+					document.getElementById('disagreeBtn').addEventListener('click', function() {
+						rejectAgreement();
+					});
+					
+					// 显示完整条款
+					document.getElementById('showFullTerms').addEventListener('click', function(e) {
+						e.preventDefault();
+						alert('1');
+					});
+					
+					// 自动聚焦到复选框
+					agreeCheckbox.focus();
+				}, 100);
+			}
+			
+			// 接受协议
+			function acceptAgreement() {
+				const remember = document.getElementById('rememberCheckbox').checked;
+				
+				// 保存用户选择
+				localStorage.setItem(AGREEMENT_KEY, 'true');
+				localStorage.setItem(TIMESTAMP_KEY, Date.now().toString());
+				localStorage.setItem(REMEMBER_KEY, remember.toString());
+				
+				// 隐藏协议弹窗，显示主内容
+				document.getElementById('user-agreement-modal').style.opacity = '0';
+				document.getElementById('user-agreement-modal').style.transition = 'opacity 0.5s ease';
+				
+				setTimeout(() => {
+					document.getElementById('user-agreement-modal').style.display = 'none';
+					document.getElementById('main-content').style.display = 'block';
+					
+					// 启动页面防护系统
+					initializePageProtection();
+				}, 500);
+			}
+			
+			// 拒绝协议
+			function rejectAgreement() {
+				// 清空之前的同意记录
+				localStorage.removeItem(AGREEMENT_KEY);
+				localStorage.removeItem(TIMESTAMP_KEY);
+				localStorage.removeItem(REMEMBER_KEY);
+				
+				// 显示拒绝提示
+				document.getElementById('user-agreement-modal').innerHTML = `
+					<div class="agreement-container" style="max-width: 500px;">
+						<div class="agreement-header">
+							<h1>访问被拒绝</h1>
+						</div>
+						<div class="agreement-content" style="text-align: center; padding: 50px 30px;">
+							<div style="font-size: 60px; color: #dc3545; margin-bottom: 20px;">❌</div>
+							<h2 style="color: #dc3545;">需要同意协议</h2>
+							<p style="color: #666; margin-bottom: 25px;">
+								您需要同意用户协议才能访问本网站。
+							</p>
+							<button onclick="location.reload()" style="
+								padding: 12px 30px;
+								background: #4b6cb7;
+								color: white;
+								border: none;
+								border-radius: 8px;
+								font-size: 16px;
+								cursor: pointer;
+								margin-top: 10px;
+							">
+								重新考虑
+							</button>
+						</div>
+					</div>
+				`;
+			}
+			
+			// 页面加载时检查
+			if (shouldShowAgreement()) {
+				// 显示协议弹窗
+				showAgreement();
+			} else {
+				// 直接显示主内容
+				document.getElementById('user-agreement-modal').style.display = 'none';
+				document.getElementById('main-content').style.display = 'block';
+				
+				// 启动页面防护系统
+				setTimeout(initializePageProtection, 100);
+			}
+			
+			// 暴露初始化函数
+			window.initializePageProtection = initializePageProtection;
+			
+		})();
+
+        // 页面加载时立即检查防护状态
+        (function() {
+            // 密码配置
+            const ADMIN_PASSWORD = "homo114514";
+            const PROTECTION_EXPIRY_KEY = "protection_expiry";
             
-            if (expiry) {
-                const expiryTime = parseInt(expiry);
-                const currentTime = Date.now();
+            // 检查是否在有效期内（只在页面加载时调用一次）
+            function isWithinProtectionWindow() {
+                const expiry = localStorage.getItem(PROTECTION_EXPIRY_KEY);
                 
-                if (currentTime < expiryTime) {
-                    // 在有效期内，不启动防护
-                    const remainingSeconds = Math.round((expiryTime - currentTime) / 1000);
-                    console.log(`防护已关闭`);
+                if (expiry) {
+                    const expiryTime = parseInt(expiry);
+                    const currentTime = Date.now();
                     
-                    // 关键：移除文字选择限制
-                    removeTextSelectionProtection();
-                    
-                    // 显示一个简单的提示（可选）
-                    showExpiryNotification(remainingSeconds);
-                    return true;
+                    if (currentTime < expiryTime) {
+                        // 在有效期内，不启动防护
+                        const remainingSeconds = Math.round((expiryTime - currentTime) / 1000);
+                        console.log(`防护已关闭`);
+                        
+                        // 关键：移除文字选择限制
+                        removeTextSelectionProtection();
+                        
+                        // 显示一个简单的提示（可选）
+                        showExpiryNotification(remainingSeconds);
+                        return true;
+                    } else {
+                        // 已过期，清理storage
+                        localStorage.removeItem(PROTECTION_EXPIRY_KEY);
+                        // 确保文字选择限制生效
+                        addTextSelectionProtection();
+                    }
                 } else {
-                    // 已过期，清理storage
-                    localStorage.removeItem(PROTECTION_EXPIRY_KEY);
-                    // 确保文字选择限制生效
+                    // 没有存储，确保文字选择限制生效
                     addTextSelectionProtection();
                 }
-            } else {
-                // 没有存储，确保文字选择限制生效
-                addTextSelectionProtection();
+                return false;
             }
-            return false;
-        }
-        
-        // 移除文字选择限制
-        function removeTextSelectionProtection() {
-            // 方法1：添加一个标记类来覆盖样式
-            document.documentElement.classList.add('protection-disabled');
             
-            // 方法2：直接修改所有protected-content元素的样式
-            setTimeout(() => {
-                const elements = document.querySelectorAll('.protected-content');
-                elements.forEach(el => {
-                    el.style.userSelect = 'auto';
-                    el.style.webkitUserSelect = 'auto';
-                    el.style.mozUserSelect = 'auto';
-                    el.style.msUserSelect = 'auto';
-                });
-            }, 100);
-        }
-        
-        // 添加文字选择限制
-        function addTextSelectionProtection() {
-            // 移除标记类
-            document.documentElement.classList.remove('protection-disabled');
+            // 移除文字选择限制
+            function removeTextSelectionProtection() {
+                // 方法1：添加一个标记类来覆盖样式
+                document.documentElement.classList.add('protection-disabled');
+                
+                // 方法2：直接修改所有protected-content元素的样式
+                setTimeout(() => {
+                    const elements = document.querySelectorAll('.protected-content');
+                    elements.forEach(el => {
+                        el.style.userSelect = 'auto';
+                        el.style.webkitUserSelect = 'auto';
+                        el.style.mozUserSelect = 'auto';
+                        el.style.msUserSelect = 'auto';
+                    });
+                }, 100);
+            }
             
-            // 确保CSS类生效
-            setTimeout(() => {
-                const elements = document.querySelectorAll('.protected-content');
-                elements.forEach(el => {
-                    el.style.userSelect = '';
-                    el.style.webkitUserSelect = '';
-                    el.style.mozUserSelect = '';
-                    el.style.msUserSelect = '';
-                });
-            }, 100);
-        }
-        
-        // 如果还在有效期内，直接跳过所有防护代码
-        if (isWithinProtectionWindow()) {
-            return; // 重要：直接退出，不执行下面的防护代码
-        }
-        
-        // =========== 以下是防护代码（只在未验证或已过期时执行） ===========
-        
-        // 确保文字选择限制生效
-        addTextSelectionProtection();
-        
-        // 显示密码输入界面
-        function showPasswordInput() {
-            // 清屏并显示密码输入界面
-            document.body.innerHTML = `
+            // 添加文字选择限制
+            function addTextSelectionProtection() {
+                // 移除标记类
+                document.documentElement.classList.remove('protection-disabled');
+                
+                // 确保CSS类生效
+                setTimeout(() => {
+                    const elements = document.querySelectorAll('.protected-content');
+                    elements.forEach(el => {
+                        el.style.userSelect = '';
+                        el.style.webkitUserSelect = '';
+                        el.style.mozUserSelect = '';
+                        el.style.msUserSelect = '';
+                    });
+                }, 100);
+            }
+            
+            // 如果还在有效期内，直接跳过所有防护代码
+            if (isWithinProtectionWindow()) {
+                return; // 重要：直接退出，不执行下面的防护代码
+            }
+            
+            // =========== 以下是防护代码（只在未验证或已过期时执行） ===========
+            
+            // 确保文字选择限制生效
+            addTextSelectionProtection();
+            
+            // 显示密码输入界面
+            function showPasswordInput() {
+                // 清屏并显示密码输入界面
+                document.body.innerHTML = `
                 <div id="fullscreen-warning" style="
                     position: fixed;
                     top: 0;
