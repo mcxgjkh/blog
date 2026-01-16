@@ -439,25 +439,71 @@
 	</body>
 
 	<script>
-    // 页面加载时立即启动防护
+    // 页面加载时立即检查防护状态
     (function() {
-        // 密码配置 - 硬编码（不安全！仅用于演示）
+        // 密码配置
         const ADMIN_PASSWORD = "homo114514";
-        // 用于临时存储密码验证状态（页面刷新后失效）
-        let isAdminMode = false;
-        let protectionTriggered = false; // 防止重复触发
+        const PROTECTION_EXPIRY_KEY = "protection_expiry";
         
-        // 检查是否有正在进行的防护
-        function isProtectionActive() {
-            return !isAdminMode;
+        // 检查是否在有效期内（只在页面加载时调用一次）
+        function isWithinProtectionWindow() {
+            const expiry = localStorage.getItem(PROTECTION_EXPIRY_KEY);
+            
+            if (expiry) {
+                const expiryTime = parseInt(expiry);
+                const currentTime = Date.now();
+                
+                if (currentTime < expiryTime) {
+                    // 在有效期内，不启动防护
+                    const remainingSeconds = Math.round((expiryTime - currentTime) / 1000);
+                    console.log(`防护已关闭（有效期剩余${remainingSeconds}秒）`);
+                    
+                    // 显示一个简单的提示（可选）
+                    showExpiryNotification(remainingSeconds);
+                    return true;
+                } else {
+                    // 已过期，清理storage
+                    localStorage.removeItem(PROTECTION_EXPIRY_KEY);
+                }
+            }
+            return false;
         }
+        
+        // 显示过期提示（简单版本）
+        function showExpiryNotification(remainingSeconds) {
+            setTimeout(() => {
+                const notification = document.createElement('div');
+                notification.innerHTML = `🔓 防护关闭中（${remainingSeconds}秒后过期）`;
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 10px;
+                    right: 10px;
+                    background: #28a745;
+                    color: white;
+                    padding: 8px 16px;
+                    border-radius: 20px;
+                    font-size: 14px;
+                    z-index: 999999;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+                `;
+                document.body.appendChild(notification);
+                
+                // 5秒后自动消失
+                setTimeout(() => {
+                    notification.remove();
+                }, 5000);
+            }, 1000);
+        }
+        
+        // 如果还在有效期内，直接跳过所有防护代码
+        if (isWithinProtectionWindow()) {
+            return; // 重要：直接退出，不执行下面的防护代码
+        }
+        
+        // =========== 防护代码（只在未验证或已过期时执行） ===========
         
         // 显示密码输入界面
         function showPasswordInput() {
-            // 防止重复触发
-            if (protectionTriggered) return;
-            protectionTriggered = true;
-            
             // 清屏并显示密码输入界面
             document.body.innerHTML = `
                 <div id="fullscreen-warning" style="
@@ -481,13 +527,8 @@
                         background: white;
                         border-radius: 15px;
                         box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-                        animation: slideIn 0.5s ease;
                     ">
-                        <div style="
-                            font-size: 60px;
-                            color: #dc3545;
-                            margin-bottom: 20px;
-                        ">⚠️</div>
+                        <div style="font-size: 60px; color: #dc3545; margin-bottom: 20px;">⚠️</div>
                         
                         <h2 style="color: #dc3545; margin-bottom: 10px;">安全提醒</h2>
                         
@@ -500,18 +541,12 @@
                             text-align: left;
                         ">
                             <p style="margin-bottom: 8px; color: #856404;">
-                                <strong>检测到安全防护已触发：</strong>
+                                <strong>检测到安全防护已触发</strong>
                             </p>
-                            <ul style="margin: 10px 0 10px 20px; color: #856404;">
-                                <li>开发者工具可能已打开</li>
-                                <li>或您正试图打印/保存此网站</li>
-                                <li>或触发了其他安全保护机制</li>
-                            </ul>
                         </div>
                         
                         <p style="color: #666; margin-bottom: 25px; line-height: 1.6;">
-                            为保证内容安全，页面功能已被限制。<br>
-                            如需临时关闭防护，请输入管理员密码：
+                            请输入管理员密码临时关闭防护（30秒有效）：
                         </p>
                         
                         <div style="margin: 25px 0;">
@@ -525,11 +560,8 @@
                                     border: 2px solid #e0e0e0;
                                     border-radius: 8px;
                                     font-size: 16px;
-                                    transition: all 0.3s;
                                     box-sizing: border-box;
                                 "
-                                onfocus="this.style.borderColor='#4b6cb7';"
-                                onblur="this.style.borderColor='#e0e0e0';"
                             />
                             <div id="passwordError" style="
                                 color: #dc3545;
@@ -540,11 +572,7 @@
                             "></div>
                         </div>
                         
-                        <div style="
-                            display: flex;
-                            gap: 15px;
-                            margin-top: 25px;
-                        ">
+                        <div style="display: flex; gap: 15px; margin-top: 25px;">
                             <button id="refreshBtn" style="
                                 flex: 1;
                                 padding: 14px 20px;
@@ -553,80 +581,35 @@
                                 border: 2px solid #ddd;
                                 border-radius: 8px;
                                 font-size: 16px;
-                                font-weight: 500;
                                 cursor: pointer;
-                                transition: all 0.3s;
-                            " onmouseover="this.style.background='#e9ecef';"
-                               onmouseout="this.style.background='#f8f9fa';">
+                            ">
                                 刷新页面
                             </button>
                             
                             <button id="submitBtn" style="
                                 flex: 1;
                                 padding: 14px 20px;
-                                background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+                                background: #4b6cb7;
                                 color: white;
                                 border: none;
                                 border-radius: 8px;
                                 font-size: 16px;
-                                font-weight: 500;
                                 cursor: pointer;
-                                transition: all 0.3s;
-                                box-shadow: 0 4px 15px rgba(75, 108, 183, 0.3);
-                            " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(75, 108, 183, 0.4)';"
-                               onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(75, 108, 183, 0.3)';">
+                            ">
                                 确认密码
                             </button>
-                        </div>
-                        
-                        <div style="
-                            margin-top: 25px;
-                            padding-top: 20px;
-                            border-top: 1px solid #eee;
-                            color: #999;
-                            font-size: 13px;
-                        ">
-                            <p>⚠️ 密码验证仅对当前会话有效，刷新页面后防护会重新启用</p>
                         </div>
                     </div>
                 </div>
             `;
             
-            // 添加CSS动画
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes slideIn {
-                    from { opacity: 0; transform: translateY(30px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-                @keyframes shake {
-                    0%, 100% { transform: translateX(0); }
-                    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-                    20%, 40%, 60%, 80% { transform: translateX(5px); }
-                }
-            `;
-            document.head.appendChild(style);
-            
-            // 添加按钮事件监听器
+            // 绑定按钮事件
             setTimeout(() => {
-                // 刷新按钮事件
-                document.getElementById('refreshBtn').addEventListener('click', function() {
-                    window.location.reload();
-                });
-                
-                // 确认密码按钮事件
-                document.getElementById('submitBtn').addEventListener('click', function() {
-                    checkPassword();
-                });
-                
-                // 输入框回车键事件
-                document.getElementById('adminPasswordInput').addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        checkPassword();
-                    }
-                });
-                
-                // 自动聚焦到输入框
+                document.getElementById('refreshBtn').onclick = () => location.reload();
+                document.getElementById('submitBtn').onclick = checkPassword;
+                document.getElementById('adminPasswordInput').onkeypress = (e) => {
+                    if (e.key === 'Enter') checkPassword();
+                };
                 document.getElementById('adminPasswordInput').focus();
             }, 100);
         }
@@ -637,130 +620,35 @@
             const errorDiv = document.getElementById('passwordError');
             const password = input.value.trim();
             
-            // 清空错误信息
-            errorDiv.textContent = '';
-            errorDiv.style.color = '#dc3545';
-            
             if (!password) {
                 errorDiv.textContent = '请输入密码';
-                input.style.borderColor = '#dc3545';
                 return;
             }
             
             if (password === ADMIN_PASSWORD) {
-                // 密码正确
-                errorDiv.textContent = '✓ 密码正确，正在关闭防护...';
+                // 密码正确 - 设置30秒有效期
+                const expiryTime = Date.now() + (30 * 1000);
+                localStorage.setItem(PROTECTION_EXPIRY_KEY, expiryTime.toString());
+                
+                errorDiv.textContent = '✓ 密码正确，正在重新加载...';
                 errorDiv.style.color = '#28a745';
-                input.style.borderColor = '#28a745';
                 
-                // 禁用所有防护
-                disableAllProtections();
-                
-                // 显示成功信息，然后刷新页面
+                // 1秒后刷新页面
                 setTimeout(() => {
-                    // 显示成功提示
-                    document.getElementById('fullscreen-warning').innerHTML = `
-                        <div style="text-align: center; padding: 50px;">
-                            <div style="font-size: 60px; color: #28a745; margin-bottom: 20px;">✓</div>
-                            <h2 style="color: #28a745; margin-bottom: 15px;">密码验证成功</h2>
-                            <p style="color: #666; margin-bottom: 25px; font-size: 18px;">
-                                所有防护已关闭，页面即将刷新...
-                            </p>
-                            <div style="
-                                width: 200px;
-                                height: 4px;
-                                background: #e0e0e0;
-                                border-radius: 2px;
-                                margin: 0 auto 30px;
-                                overflow: hidden;
-                            ">
-                                <div id="progressBar" style="
-                                    width: 0%;
-                                    height: 100%;
-                                    background: #28a745;
-                                    border-radius: 2px;
-                                    transition: width 2s linear;
-                                "></div>
-                            </div>
-                        </div>
-                    `;
-                    
-                    // 启动进度条
-                    setTimeout(() => {
-                        document.getElementById('progressBar').style.width = '100%';
-                    }, 100);
-                    
-                    // 2秒后刷新页面
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 2000);
+                    location.reload();
                 }, 1000);
             } else {
-                // 密码错误
-                errorDiv.textContent = '✗ 密码错误，请重试';
-                input.style.borderColor = '#dc3545';
-                input.style.animation = 'shake 0.5s';
-                
-                // 清除输入（保留焦点）
+                errorDiv.textContent = '✗ 密码错误';
                 input.value = '';
                 input.focus();
-                
-                // 移除抖动动画
-                setTimeout(() => {
-                    input.style.animation = '';
-                }, 500);
             }
         }
         
-        // 刷新页面（保持原有函数，但实际不会直接调用）
-        window.handleRefresh = function() {
-            window.location.reload();
-        };
+        // =========== 防护事件监听器 ===========
         
-        // 禁用所有防护
-        function disableAllProtections() {
-            isAdminMode = true;
-            
-            // 移除所有事件监听器
-            document.removeEventListener('keydown', keydownHandler);
-            document.removeEventListener('contextmenu', contextmenuHandler);
-            document.removeEventListener('selectstart', selectstartHandler);
-            document.removeEventListener('dragstart', dragstartHandler);
-            window.removeEventListener('resize', resizeHandler);
-            
-            // 移除防打印
-            window.onbeforeprint = null;
-            
-            // 清除所有间隔定时器
-            const maxId = setTimeout(()=>{}, 0);
-            for (let i = 0; i < maxId; i++) {
-                clearTimeout(i);
-                clearInterval(i);
-            }
-            
-            // 允许选择文本
-            if (document.querySelectorAll) {
-                document.querySelectorAll('.protected-content').forEach(el => {
-                    el.style.userSelect = 'auto';
-                    el.style.webkitUserSelect = 'auto';
-                    el.style.mozUserSelect = 'auto';
-                    el.style.msUserSelect = 'auto';
-                });
-            }
-            
-            console.log('所有防护已关闭');
-        }
-        
-        // 事件处理函数
-        function keydownHandler(e) {
-            if (isAdminMode) return;
-            
-            const blockedKeys = [
-                'F12',
-                'F8',
-                'F2'
-            ];
-            
+        // 快捷键防护
+        document.addEventListener('keydown', function(e) {
+            const blockedKeys = ['F12', 'F8'];
             const blockedCombinations = [
                 (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)),
                 (e.metaKey && e.altKey && e.key === 'I'),
@@ -775,68 +663,39 @@
                 showPasswordInput();
                 return false;
             }
-        }
+        });
         
-        function contextmenuHandler(e) {
-            if (isAdminMode) return;
+        // 右键防护
+        document.addEventListener('contextmenu', function(e) {
             e.preventDefault();
             showPasswordInput();
             return false;
-        }
+        });
         
-        function selectstartHandler(e) {
-            if (isAdminMode) return;
+        // 选择防护
+        document.addEventListener('selectstart', function(e) {
             e.preventDefault();
             return false;
-        }
+        });
         
-        function dragstartHandler(e) {
-            if (isAdminMode) return;
+        // 拖拽防护
+        document.addEventListener('dragstart', function(e) {
             e.preventDefault();
             return false;
-        }
+        });
         
-        function resizeHandler() {
-            if (isAdminMode) return;
-            
-            const newWidth = window.innerWidth;
-            const newHeight = window.innerHeight;
-            
-            // 只有当窗口大小变化很小时才检查（可能是开发者工具）
-            const widthDiff = Math.abs(newWidth - lastWidth);
-            const heightDiff = Math.abs(newHeight - lastHeight);
-            
-            if ((widthDiff > 0 && widthDiff < 100) || 
-                (heightDiff > 0 && heightDiff < 100)) {
-                // 变化很小，可能是开发者工具
-                setTimeout(() => {
-                    if (!isAdminMode) {
-                        showPasswordInput();
-                    }
-                }, 300);
+        })(); // 立即执行函数结束
+
+        // DOM加载后的附加防护
+        document.addEventListener('DOMContentLoaded', function() {
+            // 如果已经在有效期内，跳过这些防护
+            const expiry = localStorage.getItem("protection_expiry");
+            if (expiry && Date.now() < parseInt(expiry)) {
+                return;
             }
             
-            lastWidth = newWidth;
-            lastHeight = newHeight;
-        }
-        
-        // 添加事件监听器
-        document.addEventListener('keydown', keydownHandler);
-        document.addEventListener('contextmenu', contextmenuHandler);
-        document.addEventListener('selectstart', selectstartHandler);
-        document.addEventListener('dragstart', dragstartHandler);
-        
-        // 检测窗口大小变化 - 只在明显变化时检查
-        let lastWidth = window.innerWidth;
-        let lastHeight = window.innerHeight;
-        window.addEventListener('resize', resizeHandler);
-
-        })();
-
-        document.addEventListener('DOMContentLoaded', function() {
             // 防打印
             window.onbeforeprint = function() {
-                // 直接显示密码输入界面，而不是alert
                 document.dispatchEvent(new KeyboardEvent('keydown', {
                     key: 'p',
                     ctrlKey: true
@@ -844,26 +703,15 @@
                 return false;
             };
             
-            // 防PrintScreen快捷键
+            // 防PrintScreen
             document.addEventListener('keydown', function(e) {
-                // 屏蔽 Print Screen
                 if (e.key === 'PrintScreen') {
                     e.preventDefault();
-                    // 显示密码输入界面
                     const event = new Event('contextmenu');
                     document.dispatchEvent(event);
                     return false;
                 }
             });
-            
-            // 定期修改DOM，干扰截图工具
-            setInterval(() => {
-                const watermark = document.getElementById('watermark');
-                if (watermark) {
-                    const opacity = Math.random() * 0.05 + 0.02;
-                    watermark.style.opacity = opacity;
-                }
-            }, 2000);
         });
-    </script>
+</script>
 </html>
