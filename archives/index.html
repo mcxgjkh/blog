@@ -64,12 +64,20 @@
 			}
 		}
 
-		/* 防文字选择 */
+		/* 默认：防文字选择 */
         .protected-content {
             user-select: none;
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
+        }
+
+        /* 防护关闭时：允许文字选择 */
+        .protection-disabled .protected-content {
+            user-select: auto;
+            -webkit-user-select: auto;
+            -moz-user-select: auto;
+            -ms-user-select: auto;
         }
 	</style>
 
@@ -701,18 +709,60 @@
                     const remainingSeconds = Math.round((expiryTime - currentTime) / 1000);
                     console.log(`防护已关闭（有效期剩余${remainingSeconds}秒）`);
                     
+                    // 关键：移除文字选择限制
+                    removeTextSelectionProtection();
+                    
                     // 显示一个简单的提示（可选）
                     showExpiryNotification(remainingSeconds);
                     return true;
                 } else {
                     // 已过期，清理storage
                     localStorage.removeItem(PROTECTION_EXPIRY_KEY);
+                    // 确保文字选择限制生效
+                    addTextSelectionProtection();
                 }
+            } else {
+                // 没有存储，确保文字选择限制生效
+                addTextSelectionProtection();
             }
             return false;
         }
         
-        // 显示过期提示（简单版本）
+        // 移除文字选择限制
+        function removeTextSelectionProtection() {
+            // 方法1：添加一个标记类来覆盖样式
+            document.documentElement.classList.add('protection-disabled');
+            
+            // 方法2：直接修改所有protected-content元素的样式
+            setTimeout(() => {
+                const elements = document.querySelectorAll('.protected-content');
+                elements.forEach(el => {
+                    el.style.userSelect = 'auto';
+                    el.style.webkitUserSelect = 'auto';
+                    el.style.mozUserSelect = 'auto';
+                    el.style.msUserSelect = 'auto';
+                });
+            }, 100);
+        }
+        
+        // 添加文字选择限制
+        function addTextSelectionProtection() {
+            // 移除标记类
+            document.documentElement.classList.remove('protection-disabled');
+            
+            // 确保CSS类生效
+            setTimeout(() => {
+                const elements = document.querySelectorAll('.protected-content');
+                elements.forEach(el => {
+                    el.style.userSelect = '';
+                    el.style.webkitUserSelect = '';
+                    el.style.mozUserSelect = '';
+                    el.style.msUserSelect = '';
+                });
+            }, 100);
+        }
+        
+        // 显示过期提示
         function showExpiryNotification(remainingSeconds) {
             setTimeout(() => {
                 const notification = document.createElement('div');
@@ -743,7 +793,10 @@
             return; // 重要：直接退出，不执行下面的防护代码
         }
         
-        // =========== 防护代码（只在未验证或已过期时执行） ===========
+        // =========== 以下是防护代码（只在未验证或已过期时执行） ===========
+        
+        // 确保文字选择限制生效
+        addTextSelectionProtection();
         
         // 显示密码输入界面
         function showPasswordInput() {
@@ -770,8 +823,13 @@
                         background: white;
                         border-radius: 15px;
                         box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+                        animation: slideIn 0.5s ease;
                     ">
-                        <div style="font-size: 60px; color: #dc3545; margin-bottom: 20px;">⚠️</div>
+                        <div style="
+                            font-size: 60px;
+                            color: #dc3545;
+                            margin-bottom: 20px;
+                        ">⚠️</div>
                         
                         <h2 style="color: #dc3545; margin-bottom: 10px;">安全提醒</h2>
                         
@@ -784,12 +842,18 @@
                             text-align: left;
                         ">
                             <p style="margin-bottom: 8px; color: #856404;">
-                                <strong>检测到安全防护已触发</strong>
+                                <strong>检测到安全防护已触发：</strong>
                             </p>
+                            <ul style="margin: 10px 0 10px 20px; color: #856404;">
+                                <li>开发者工具可能已打开</li>
+                                <li>或您正试图打印/保存此网站</li>
+                                <li>或触发了其他安全保护机制</li>
+                            </ul>
                         </div>
                         
                         <p style="color: #666; margin-bottom: 25px; line-height: 1.6;">
-                            请输入管理员密码临时关闭防护（30秒有效）：
+                            为保证内容安全，页面功能已被限制。<br>
+                            如需临时关闭防护，请输入管理员密码：
                         </p>
                         
                         <div style="margin: 25px 0;">
@@ -803,8 +867,11 @@
                                     border: 2px solid #e0e0e0;
                                     border-radius: 8px;
                                     font-size: 16px;
+                                    transition: all 0.3s;
                                     box-sizing: border-box;
                                 "
+                                onfocus="this.style.borderColor='#4b6cb7';"
+                                onblur="this.style.borderColor='#e0e0e0';"
                             />
                             <div id="passwordError" style="
                                 color: #dc3545;
@@ -815,7 +882,11 @@
                             "></div>
                         </div>
                         
-                        <div style="display: flex; gap: 15px; margin-top: 25px;">
+                        <div style="
+                            display: flex;
+                            gap: 15px;
+                            margin-top: 25px;
+                        ">
                             <button id="refreshBtn" style="
                                 flex: 1;
                                 padding: 14px 20px;
@@ -824,26 +895,65 @@
                                 border: 2px solid #ddd;
                                 border-radius: 8px;
                                 font-size: 16px;
+                                font-weight: 500;
                                 cursor: pointer;
-                            ">
+                                transition: all 0.3s;
+                            " onmouseover="this.style.background='#e9ecef';"
+                               onmouseout="this.style.background='#f8f9fa';">
                                 刷新页面
                             </button>
                             
                             <button id="submitBtn" style="
                                 flex: 1;
                                 padding: 14px 20px;
-                                background: #4b6cb7;
+                                background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
                                 color: white;
                                 border: none;
                                 border-radius: 8px;
                                 font-size: 16px;
+                                font-weight: 500;
                                 cursor: pointer;
-                            ">
+                                transition: all 0.3s;
+                                box-shadow: 0 4px 15px rgba(75, 108, 183, 0.3);
+                            " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(75, 108, 183, 0.4)';"
+                               onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(75, 108, 183, 0.3)';">
                                 确认密码
                             </button>
                         </div>
+                        
+                        <div style="
+                            margin-top: 25px;
+                            padding-top: 20px;
+                            border-top: 1px solid #eee;
+                            color: #999;
+                            font-size: 13px;
+                        ">
+                            <p id="passwordHint">⚠️ 密码验证后防护将关闭30秒，之后需重新输入</p>
+                        </div>
                     </div>
                 </div>
+            `;
+            
+            // 添加CSS动画
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { opacity: 0; transform: translateY(30px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                @keyframes slideInRight {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideOutRight {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                    20%, 40%, 60%, 80% { transform: translateX(5px); }
+                }
             `;
             
             // 绑定按钮事件
@@ -872,6 +982,9 @@
                 // 密码正确 - 设置30秒有效期
                 const expiryTime = Date.now() + (30 * 1000);
                 localStorage.setItem(PROTECTION_EXPIRY_KEY, expiryTime.toString());
+                
+                // 立即移除文字选择限制
+                removeTextSelectionProtection();
                 
                 errorDiv.textContent = '✓ 密码正确，正在重新加载...';
                 errorDiv.style.color = '#28a745';
@@ -934,6 +1047,16 @@
             // 如果已经在有效期内，跳过这些防护
             const expiry = localStorage.getItem("protection_expiry");
             if (expiry && Date.now() < parseInt(expiry)) {
+                // 移除文字选择限制
+                setTimeout(() => {
+                    const elements = document.querySelectorAll('.protected-content');
+                    elements.forEach(el => {
+                        el.style.userSelect = 'auto';
+                        el.style.webkitUserSelect = 'auto';
+                        el.style.mozUserSelect = 'auto';
+                        el.style.msUserSelect = 'auto';
+                    });
+                }, 100);
                 return;
             }
             
@@ -956,5 +1079,5 @@
                 }
             });
         });
-</script>
+    </script>
 </html>
