@@ -55,6 +55,7 @@
 
 	<style>
         /* 用户协议弹窗样式 */
+        
 		#user-agreement-modal {
 			position: fixed;
 			top: 0;
@@ -271,6 +272,8 @@
 			to { opacity: 0; }
 		}
 
+        
+
 		@media print {
 			body * {
 				visibility: hidden !important;
@@ -299,6 +302,7 @@
 	</style>
 
 	<body>
+        
         <!-- 用户协议弹窗 -->
 		<div id="user-agreement-modal">
 			<div class="agreement-container">
@@ -378,6 +382,8 @@
 				</div>
 			</div>
 		</div>
+
+        
 		
 		<!-- 网站主内容（默认隐藏） -->
 		<div id="main-content" style="display: none;">
@@ -990,6 +996,7 @@
 	</body>
 
 	<script>
+        
         // 用户协议管理
 		(function() {
 			// 存储键名
@@ -1119,23 +1126,20 @@
 				`;
 			}
 			
-			// 页面加载时检查
-			if (shouldShowAgreement()) {
-				// 显示协议弹窗
-				showAgreement();
-			} else {
-				// 直接显示主内容
-				document.getElementById('user-agreement-modal').style.display = 'none';
-				document.getElementById('main-content').style.display = 'block';
+		// 页面加载时检查
+		if (shouldShowAgreement()) {
+			// 显示协议弹窗
+			showAgreement();
+		} else {
+			// 直接显示主内容
+			document.getElementById('user-agreement-modal').style.display = 'none';
+			document.getElementById('main-content').style.display = 'block';
 				
-				// 启动页面防护系统
-				setTimeout(initializePageProtection, 100);
-			}
-			
-			// 暴露初始化函数
-			window.initializePageProtection = initializePageProtection;
-			
+			// 启动页面防护系统
+			setTimeout(initializePageProtection, 100);
+		}
 		})();
+		
 
         // 页面加载时立即检查防护状态
         (function() {
