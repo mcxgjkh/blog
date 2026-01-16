@@ -441,100 +441,19 @@
 	<script>
         // 页面加载时立即启动防护
         (function() {
-            // 禁用F12及各种快捷键
-            document.addEventListener('keydown', function(e) {
-                const blockedKeys = [
-                    'F12',
-                    'F8',    // 调试暂停
-                    'F5',    // 刷新（可选择性禁用）
-                    'F2'     // 重命名/编辑
-                ];
-                
-                const blockedCombinations = [
-                    // Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
-                    (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)),
-                    // Cmd+Option+I (Mac)
-                    (e.metaKey && e.altKey && e.key === 'I'),
-                    // Ctrl+U (查看源代码)
-                    (e.ctrlKey && e.key === 'u'),
-                    // Ctrl+S (保存页面)
-                    (e.ctrlKey && e.key === 's'),
-                    // Ctrl+P (打印)
-                    (e.ctrlKey && e.key === 'p')
-                ];
-                
-                if (blockedKeys.includes(e.key) || blockedCombinations.some(combo => combo)) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    showWarning();
-                    return false;
-                }
-            });
+            // 密码配置 - 硬编码
+            const ADMIN_PASSWORD = "homo114514";
+            // 用于临时存储密码验证状态（页面刷新后失效）
+            let isAdminMode = false;
             
-            // 禁用右键菜单
-            document.addEventListener('contextmenu', function(e) {
-                e.preventDefault();
-                showWarning();
-                return false;
-            });
+            // 检查是否有正在进行的防护
+            function isProtectionActive() {
+                return !isAdminMode;
+            }
             
-            // 禁用选择文本
-            document.addEventListener('selectstart', function(e) {
-                e.preventDefault();
-                return false;
-            });
-            
-            // 禁用拖拽
-            document.addEventListener('dragstart', function(e) {
-                e.preventDefault();
-                return false;
-            });
-            
-            // 检测调试器
-            let lastTime = Date.now();
-            setInterval(function() {
-                const currentTime = Date.now();
-                if (currentTime - lastTime > 200) {
-                    // 时间差异常，可能打开了调试器
-                    takeAction();
-                }
-                lastTime = currentTime;
-            }, 100);
-            
-            // 检测窗口大小变化（开发者工具可能改变窗口大小）
-            let lastWidth = window.innerWidth;
-            let lastHeight = window.innerHeight;
-            window.addEventListener('resize', function() {
-                const newWidth = window.innerWidth;
-                const newHeight = window.innerHeight;
-                
-                // 如果尺寸变化很小，可能是开发者工具
-                if (Math.abs(newWidth - lastWidth) < 100 || 
-                    Math.abs(newHeight - lastHeight) < 100) {
-                    takeAction();
-                }
-                
-                lastWidth = newWidth;
-                lastHeight = newHeight;
-            });
-            
-            function showWarning() {
-                // 显示临时警告
-                const warning = document.createElement('div');
-                warning.innerHTML = '此操作已被禁止';
-                warning.style.cssText = `
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    background: #ff4444;
-                    color: white;
-                    padding: 10px 20px;
-                    border-radius: 5px;
-                    z-index: 99999;
-                    animation: fadeOut 3s forwards;
-                `;
-
-                // 清屏并显示警告
+            // 显示密码输入界面
+            function showPasswordInput() {
+                // 清屏并显示密码输入界面
                 document.body.innerHTML = `
                     <div id="fullscreen-warning" style="
                         position: fixed;
@@ -542,7 +461,7 @@
                         left: 0;
                         width: 100%;
                         height: 100%;
-                        background: #f8f9fa;
+                        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
                         z-index: 999999;
                         display: flex;
                         justify-content: center;
@@ -552,44 +471,357 @@
                         <div style="
                             text-align: center;
                             max-width: 500px;
-                            padding: 40px;
+                            width: 90%;
+                            padding: 40px 30px;
                             background: white;
-                            border-radius: 10px;
-                            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                            border-radius: 15px;
+                            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+                            animation: slideIn 0.5s ease;
                         ">
-                            <h2 style="color: #dc3545;">⚠️ 安全提醒</h2>
-                            <p>检测到开发者工具已打开或您正试图打印保存此网站.</p>
-                            <p>为保证内容安全，页面功能已被限制。</p>
-                            <p>请关闭开发者工具或取消打印保存后刷新页面。</p>
-                            <button onclick="location.reload()" style="
-                                margin-top: 20px;
-                                padding: 10px 30px;
-                                background: #007bff;
-                                color: white;
-                                border: none;
-                                border-radius: 5px;
-                                cursor: pointer;
+                            <div style="
+                                font-size: 60px;
+                                color: #dc3545;
+                                margin-bottom: 20px;
+                            ">⚠️</div>
+                            
+                            <h2 style="color: #dc3545; margin-bottom: 10px;">安全提醒</h2>
+                            
+                            <div style="
+                                background: #fff9e6;
+                                border-left: 4px solid #ffc107;
+                                padding: 15px;
+                                margin: 20px 0;
+                                border-radius: 8px;
+                                text-align: left;
                             ">
-                                刷新页面
-                            </button>
+                                <p style="margin-bottom: 8px; color: #856404;">
+                                    <strong>检测到安全防护已触发：</strong>
+                                </p>
+                                <ul style="margin: 10px 0 10px 20px; color: #856404;">
+                                    <li>开发者工具可能已打开</li>
+                                    <li>或您正试图打印/保存此网站</li>
+                                    <li>或触发了其他安全保护机制</li>
+                                </ul>
+                            </div>
+                            
+                            <p style="color: #666; margin-bottom: 25px; line-height: 1.6;">
+                                为保证内容安全，页面功能已被限制。<br>
+                                如需临时关闭防护，请输入管理员密码：
+                            </p>
+                            
+                            <div style="margin: 25px 0;">
+                                <input 
+                                    type="password" 
+                                    id="adminPasswordInput"
+                                    placeholder="请输入管理员密码"
+                                    style="
+                                        width: 100%;
+                                        padding: 14px 18px;
+                                        border: 2px solid #e0e0e0;
+                                        border-radius: 8px;
+                                        font-size: 16px;
+                                        transition: all 0.3s;
+                                        box-sizing: border-box;
+                                    "
+                                    onfocus="this.style.borderColor='#4b6cb7';"
+                                    onblur="this.style.borderColor='#e0e0e0';"
+                                />
+                                <div id="passwordError" style="
+                                    color: #dc3545;
+                                    font-size: 14px;
+                                    margin-top: 10px;
+                                    min-height: 20px;
+                                    text-align: left;
+                                "></div>
+                            </div>
+                            
+                            <div style="
+                                display: flex;
+                                gap: 15px;
+                                margin-top: 25px;
+                            ">
+                                <button onclick="handleRefresh()" style="
+                                    flex: 1;
+                                    padding: 14px 20px;
+                                    background: #f8f9fa;
+                                    color: #666;
+                                    border: 2px solid #ddd;
+                                    border-radius: 8px;
+                                    font-size: 16px;
+                                    font-weight: 500;
+                                    cursor: pointer;
+                                    transition: all 0.3s;
+                                " onmouseover="this.style.background='#e9ecef';"
+                                   onmouseout="this.style.background='#f8f9fa';">
+                                    刷新页面
+                                </button>
+                                
+                                <button onclick="checkPassword()" style="
+                                    flex: 1;
+                                    padding: 14px 20px;
+                                    background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+                                    color: white;
+                                    border: none;
+                                    border-radius: 8px;
+                                    font-size: 16px;
+                                    font-weight: 500;
+                                    cursor: pointer;
+                                    transition: all 0.3s;
+                                    box-shadow: 0 4px 15px rgba(75, 108, 183, 0.3);
+                                " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(75, 108, 183, 0.4)';"
+                                   onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(75, 108, 183, 0.3)';">
+                                    确认密码
+                                </button>
+                            </div>
+                            
+                            <div style="
+                                margin-top: 25px;
+                                padding-top: 20px;
+                                border-top: 1px solid #eee;
+                                color: #999;
+                                font-size: 13px;
+                            ">
+                                <p>⚠️ 密码验证仅对当前会话有效，刷新页面后防护会重新启用</p>
+                            </div>
                         </div>
                     </div>
                 `;
-
-                // 阻止所有键盘和鼠标事件
-                document.addEventListener('keydown', e => e.preventDefault(), true);
-                document.addEventListener('click', e => e.preventDefault(), true);
-                document.addEventListener('mousedown', e => e.preventDefault(), true);
                 
-                document.body.appendChild(warning);
-                setTimeout(() => warning.remove(), 3000);
+                // 添加CSS动画
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes slideIn {
+                        from { opacity: 0; transform: translateY(30px); }
+                        to { opacity: 1; transform: translateY(0); }
+                    }
+                    @keyframes shake {
+                        0%, 100% { transform: translateX(0); }
+                        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                        20%, 40%, 60%, 80% { transform: translateX(5px); }
+                    }
+                `;
+                document.head.appendChild(style);
+                
+                // 监听回车键
+                document.getElementById('adminPasswordInput').addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        checkPassword();
+                    }
+                });
             }
+            
+            // 检查密码
+            function checkPassword() {
+                const input = document.getElementById('adminPasswordInput');
+                const errorDiv = document.getElementById('passwordError');
+                const password = input.value.trim();
+                
+                // 清空错误信息
+                errorDiv.textContent = '';
+                errorDiv.style.color = '#dc3545';
+                
+                if (!password) {
+                    errorDiv.textContent = '请输入密码';
+                    input.style.borderColor = '#dc3545';
+                    return;
+                }
+                
+                if (password === ADMIN_PASSWORD) {
+                    // 密码正确
+                    errorDiv.textContent = '✓ 密码正确，正在关闭防护...';
+                    errorDiv.style.color = '#28a745';
+                    input.style.borderColor = '#28a745';
+                    
+                    // 禁用所有防护
+                    disableAllProtections();
+                    
+                    // 显示成功信息，然后刷新页面
+                    setTimeout(() => {
+                        // 显示成功提示
+                        document.getElementById('fullscreen-warning').innerHTML = `
+                            <div style="text-align: center; padding: 50px;">
+                                <div style="font-size: 60px; color: #28a745; margin-bottom: 20px;">✓</div>
+                                <h2 style="color: #28a745; margin-bottom: 15px;">密码验证成功</h2>
+                                <p style="color: #666; margin-bottom: 25px; font-size: 18px;">
+                                    所有防护已关闭，页面即将刷新...
+                                </p>
+                                <div style="
+                                    width: 200px;
+                                    height: 4px;
+                                    background: #e0e0e0;
+                                    border-radius: 2px;
+                                    margin: 0 auto 30px;
+                                    overflow: hidden;
+                                ">
+                                    <div id="progressBar" style="
+                                        width: 0%;
+                                        height: 100%;
+                                        background: #28a745;
+                                        border-radius: 2px;
+                                        transition: width 2s linear;
+                                    "></div>
+                                </div>
+                            </div>
+                        `;
+                        
+                        // 启动进度条
+                        setTimeout(() => {
+                            document.getElementById('progressBar').style.width = '100%';
+                        }, 100);
+                        
+                        // 2秒后刷新页面
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
+                    }, 1000);
+                } else {
+                    // 密码错误
+                    errorDiv.textContent = '✗ 密码错误，请重试';
+                    input.style.borderColor = '#dc3545';
+                    input.style.animation = 'shake 0.5s';
+                    
+                    // 清除输入（保留焦点）
+                    input.value = '';
+                    input.focus();
+                    
+                    // 移除抖动动画
+                    setTimeout(() => {
+                        input.style.animation = '';
+                    }, 500);
+                }
+            }
+            
+            // 刷新页面
+            function handleRefresh() {
+                window.location.reload();
+            }
+            
+            // 禁用所有防护
+            function disableAllProtections() {
+                isAdminMode = true;
+                
+                // 移除所有事件监听器
+                const oldKeydown = document.onkeydown;
+                const oldContextmenu = document.oncontextmenu;
+                const oldSelectstart = document.onselectstart;
+                const oldDragstart = document.ondragstart;
+                
+                document.onkeydown = null;
+                document.oncontextmenu = null;
+                document.onselectstart = null;
+                document.ondragstart = null;
+                
+                // 移除防打印
+                window.onbeforeprint = null;
+                
+                // 清除所有间隔定时器
+                const maxId = setTimeout(()=>{}, 0);
+                for (let i = 0; i < maxId; i++) {
+                    clearTimeout(i);
+                    clearInterval(i);
+                }
+                
+                // 允许选择文本
+                document.querySelectorAll('.protected-content').forEach(el => {
+                    el.style.userSelect = 'auto';
+                    el.style.webkitUserSelect = 'auto';
+                    el.style.mozUserSelect = 'auto';
+                    el.style.msUserSelect = 'auto';
+                });
+                
+                console.log('所有防护已关闭');
+            }
+            
+            // 防护代码
+            document.addEventListener('keydown', function(e) {
+                if (isAdminMode) return;
+                
+                const blockedKeys = [
+                    'F12',
+                    'F8',
+                    'F5',
+                    'F2'
+                ];
+                
+                const blockedCombinations = [
+                    (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)),
+                    (e.metaKey && e.altKey && e.key === 'I'),
+                    (e.ctrlKey && e.key === 'u'),
+                    (e.ctrlKey && e.key === 's'),
+                    (e.ctrlKey && e.key === 'p')
+                ];
+                
+                if (blockedKeys.includes(e.key) || blockedCombinations.some(combo => combo)) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    showPasswordInput();
+                    return false;
+                }
+            });
+            
+            document.addEventListener('contextmenu', function(e) {
+                if (isAdminMode) return;
+                e.preventDefault();
+                showPasswordInput();
+                return false;
+            });
+            
+            document.addEventListener('selectstart', function(e) {
+                if (isAdminMode) return;
+                e.preventDefault();
+                return false;
+            });
+            
+            document.addEventListener('dragstart', function(e) {
+                if (isAdminMode) return;
+                e.preventDefault();
+                return false;
+            });
+            
+            // 检测调试器
+            let lastTime = Date.now();
+            const debugCheck = setInterval(function() {
+                if (isAdminMode) {
+                    clearInterval(debugCheck);
+                    return;
+                }
+                
+                const currentTime = Date.now();
+                if (currentTime - lastTime > 200) {
+                    showPasswordInput();
+                    clearInterval(debugCheck);
+                }
+                lastTime = currentTime;
+            }, 100);
+            
+            // 检测窗口大小变化
+            let lastWidth = window.innerWidth;
+            let lastHeight = window.innerHeight;
+            window.addEventListener('resize', function() {
+                if (isAdminMode) return;
+                
+                const newWidth = window.innerWidth;
+                const newHeight = window.innerHeight;
+                
+                if (Math.abs(newWidth - lastWidth) < 100 || 
+                    Math.abs(newHeight - lastHeight) < 100) {
+                    showPasswordInput();
+                }
+                
+                lastWidth = newWidth;
+                lastHeight = newHeight;
+            });
+            
         })();
 
 		document.addEventListener('DOMContentLoaded', function() {
             // 防打印
             window.onbeforeprint = function() {
-                alert('此内容受保护，禁止打印');
+                // 直接显示密码输入界面，而不是alert
+                document.dispatchEvent(new KeyboardEvent('keydown', {
+                    key: 'p',
+                    ctrlKey: true
+                }));
                 return false;
             };
             
@@ -598,38 +830,20 @@
                 // 屏蔽 Print Screen
                 if (e.key === 'PrintScreen') {
                     e.preventDefault();
-                    document.body.style.filter = 'blur(5px)';
-                    setTimeout(() => {
-                        document.body.style.filter = '';
-                    }, 1000);
+                    // 显示密码输入界面
+                    const event = new Event('contextmenu');
+                    document.dispatchEvent(event);
                     return false;
                 }
-                
-                // 屏蔽 Ctrl+P/Cmd+P
-                if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
-                    e.preventDefault();
-                    alert('此内容禁止打印');
-                    return false;
-                }
-            });
-            
-            // 防右键菜单
-            document.addEventListener('contextmenu', function(e) {
-                e.preventDefault();
-                return false;
-            });
-            
-            // 防拖拽
-            document.addEventListener('dragstart', function(e) {
-                e.preventDefault();
-                return false;
             });
             
             // 定期修改DOM，干扰截图工具
             setInterval(() => {
                 const watermark = document.getElementById('watermark');
-                const opacity = Math.random() * 0.05 + 0.02;
-                watermark.style.opacity = opacity;
+                if (watermark) {
+                    const opacity = Math.random() * 0.05 + 0.02;
+                    watermark.style.opacity = opacity;
+                }
             }, 2000);
         });
     </script>
