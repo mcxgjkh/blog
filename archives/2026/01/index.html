@@ -670,7 +670,7 @@
                 if (currentTime < expiryTime) {
                     // 在有效期内，不启动防护
                     const remainingSeconds = Math.round((expiryTime - currentTime) / 1000);
-                    console.log(`防护已关闭（有效期剩余${remainingSeconds}秒）`);
+                    console.log(`防护已关闭`);
                     
                     // 关键：移除文字选择限制
                     removeTextSelectionProtection();
