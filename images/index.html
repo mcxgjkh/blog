@@ -424,10 +424,13 @@
 	</body>
 
 	<script>
-        
+        // 用户协议管理（只在首页执行）
+		
 		// 非首页：直接显示内容并启动防护
 		document.addEventListener('DOMContentLoaded', function() {
-			initializePageProtection();
+			if (typeof initializePageProtection === 'function') {
+				initializePageProtection();
+			}
 		});
 		
 
