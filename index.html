@@ -253,13 +253,14 @@
 		@media (max-width: 768px) {
 			#user-agreement-modal {
 				padding: 15px;
-				align-items: flex-start;
+				align-items: center; /* 修复：保持居中 */
+				justify-content: center; /* 修复：保持居中 */
 				overflow-y: auto;
 			}
 			
 			.agreement-container {
 				max-height: 85vh;
-				margin-top: 5vh;
+				margin: auto; /* 确保居中 */
 				border-radius: 15px;
 			}
 			
@@ -356,11 +357,13 @@
 		@media (max-width: 480px) {
 			#user-agreement-modal {
 				padding: 10px;
+				align-items: center; /* 修复：保持居中 */
+				justify-content: center; /* 修复：保持居中 */
 			}
 			
 			.agreement-container {
 				max-height: 90vh;
-				margin-top: 5vh;
+				margin: auto; /* 确保居中 */
 				border-radius: 12px;
 			}
 			
@@ -395,10 +398,23 @@
 			.remember-choice label {
 				font-size: 12px;
 			}
+
+			.remember-choice input {
+				font-size: 12px;
+			}
 		}
 		
 		/* 超小屏幕特殊处理 */
 		@media (max-width: 360px) {
+			#user-agreement-modal {
+				align-items: center; /* 修复：保持居中 */
+				justify-content: center; /* 修复：保持居中 */
+			}
+			
+			.agreement-container {
+				margin: auto; /* 确保居中 */
+			}
+			
 			.agreement-header h1 {
 				font-size: 18px;
 			}
@@ -420,6 +436,31 @@
 			.agreement-checkbox label {
 				order: 2;
 				width: 100%;
+			}
+		}
+		
+		/* 确保始终居中的备用方案 */
+		.agreement-container-wrapper {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 100%;
+			height: 100%;
+			padding: 20px;
+			box-sizing: border-box;
+		}
+		
+		/* 修复内容过长时的居中问题 */
+		@media (max-height: 600px) {
+			#user-agreement-modal {
+				align-items: flex-start; /* 超小高度时顶部对齐 */
+				padding-top: 20px;
+				overflow-y: auto;
+			}
+			
+			.agreement-container {
+				margin-top: 20px;
+				margin-bottom: 20px;
 			}
 		}
 		
