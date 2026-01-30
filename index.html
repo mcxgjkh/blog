@@ -249,85 +249,125 @@
 			box-shadow: none;
 		}
 		
-		/* 响应式设计 */
+		/* 重新设计复选框区域 */
+		.agreement-checkbox-group {
+			display: flex;
+			flex-direction: column;
+			gap: 12px;
+		}
+		
+		.agreement-checkbox {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			cursor: pointer;
+			padding: 8px 0;
+		}
+		
+		/* 统一复选框样式 */
+		.agreement-checkbox input[type="checkbox"],
+		.remember-choice input[type="checkbox"] {
+			width: 20px;
+			height: 20px;
+			cursor: pointer;
+			flex-shrink: 0;
+			margin: 0;
+			appearance: none;
+			-webkit-appearance: none;
+			background: white;
+			border: 2px solid #ccc;
+			border-radius: 4px;
+			position: relative;
+			transition: all 0.2s ease;
+		}
+		
+		/* 复选框选中状态 */
+		.agreement-checkbox input[type="checkbox"]:checked,
+		.remember-choice input[type="checkbox"]:checked {
+			background: #4b6cb7;
+			border-color: #4b6cb7;
+		}
+		
+		/* 复选框勾选标记 */
+		.agreement-checkbox input[type="checkbox"]:checked::after,
+		.remember-choice input[type="checkbox"]:checked::after {
+			content: "✓";
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			color: white;
+			font-size: 14px;
+			font-weight: bold;
+		}
+		
+		/* 复选框悬停效果 */
+		.agreement-checkbox input[type="checkbox"]:hover,
+		.remember-choice input[type="checkbox"]:hover {
+			border-color: #4b6cb7;
+			box-shadow: 0 0 0 2px rgba(75, 108, 183, 0.1);
+		}
+		
+		.agreement-checkbox label {
+			font-size: 16px;
+			color: #333;
+			cursor: pointer;
+			user-select: none;
+			line-height: 1.5;
+			flex: 1;
+			font-weight: 500;
+		}
+		
+		.agreement-checkbox a {
+			color: #4b6cb7;
+			text-decoration: none;
+			font-weight: 600;
+			white-space: nowrap;
+		}
+		
+		.agreement-checkbox a:hover {
+			text-decoration: underline;
+		}
+		
+		.remember-choice {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			cursor: pointer;
+			padding: 6px 0;
+			margin-left: 32px; /* 与主复选框对齐 */
+		}
+		
+		.remember-choice label {
+			font-size: 14px;
+			color: #666;
+			line-height: 1.4;
+			cursor: pointer;
+			user-select: none;
+		}
+		
+		/* 响应式设计中的复选框调整 */
 		@media (max-width: 768px) {
-			#user-agreement-modal {
-				padding: 15px;
-				align-items: center; /* 修复：保持居中 */
-				justify-content: center; /* 修复：保持居中 */
-				overflow-y: auto;
+			.agreement-checkbox {
+				gap: 10px;
+				padding: 6px 0;
 			}
 			
-			.agreement-container {
-				max-height: 85vh;
-				margin: auto; /* 确保居中 */
-				border-radius: 15px;
+			.agreement-checkbox label {
+				font-size: 15px;
 			}
 			
-			.agreement-header {
-				padding: 20px 25px;
+			.remember-choice {
+				margin-left: 30px;
+				gap: 8px;
 			}
 			
-			.agreement-header h1 {
-				font-size: 22px;
-				margin-bottom: 6px;
-			}
-			
-			.agreement-header p {
+			.remember-choice label {
 				font-size: 13px;
 			}
-			
-			.agreement-content {
-				padding: 20px 25px;
-			}
-			
-			.agreement-content h2 {
-				font-size: 18px;
-				margin: 20px 0 12px 0;
-			}
-			
-			.agreement-content h3 {
-				font-size: 15px;
-				margin: 18px 0 9px 0;
-			}
-			
-			.agreement-content p {
-				font-size: 14px;
-				text-align: left;
-			}
-			
-			.agreement-content li {
-				font-size: 14px;
-			}
-			
-			.agreement-footer {
-				padding: 20px 25px;
-				flex-direction: column;
-				gap: 20px;
-			}
-			
-			.agreement-footer-left {
-				min-width: 100%;
-				order: 2;
-			}
-			
-			.agreement-footer-right {
-				width: 100%;
-				order: 1;
-			}
-			
-			.agreement-buttons {
-				flex-direction: column;
-				gap: 12px;
-				width: 100%;
-			}
-			
-			.agreement-btn {
-				width: 100%;
-				min-width: 0;
-				padding: 16px;
-			}
-			
+		}
+		
+		@media (max-width: 480px) {
 			.agreement-checkbox {
 				align-items: flex-start;
 				gap: 10px;
@@ -335,132 +375,26 @@
 			
 			.agreement-checkbox label {
 				font-size: 14px;
-				line-height: 1.5;
+			}
+			
+			.remember-choice {
+				margin-left: 30px;
 			}
 			
 			.remember-choice label {
-				font-size: 13px;
-			}
-			
-			.warning-box {
-				padding: 15px;
-				margin: 15px 0;
-			}
-			
-			.terms-scroll {
-				padding: 15px;
-				max-height: 200px;
-				font-size: 13px;
-			}
-		}
-		
-		@media (max-width: 480px) {
-			#user-agreement-modal {
-				padding: 10px;
-				align-items: center; /* 修复：保持居中 */
-				justify-content: center; /* 修复：保持居中 */
-			}
-			
-			.agreement-container {
-				max-height: 90vh;
-				margin: auto; /* 确保居中 */
-				border-radius: 12px;
-			}
-			
-			.agreement-header {
-				padding: 18px 20px;
-			}
-			
-			.agreement-header h1 {
-				font-size: 20px;
-			}
-			
-			.agreement-content {
-				padding: 18px 20px;
-			}
-			
-			.agreement-content h2 {
-				font-size: 17px;
-			}
-			
-			.agreement-content h3 {
-				font-size: 14px;
-			}
-			
-			.agreement-footer {
-				padding: 18px 20px;
-			}
-			
-			.agreement-checkbox label {
-				font-size: 13px;
-			}
-			
-			.remember-choice label {
-				font-size: 12px;
-			}
-
-			.remember-choice input {
 				font-size: 12px;
 			}
 		}
 		
 		/* 超小屏幕特殊处理 */
 		@media (max-width: 360px) {
-			#user-agreement-modal {
-				align-items: center; /* 修复：保持居中 */
-				justify-content: center; /* 修复：保持居中 */
-			}
-			
-			.agreement-container {
-				margin: auto; /* 确保居中 */
-			}
-			
-			.agreement-header h1 {
-				font-size: 18px;
-			}
-			
-			.agreement-header p {
-				font-size: 12px;
-			}
-			
 			.agreement-checkbox {
-				flex-direction: column;
-				align-items: flex-start;
-				gap: 8px;
+				flex-direction: row;
+				align-items: center;
 			}
 			
-			.agreement-checkbox input[type="checkbox"] {
-				order: 1;
-			}
-			
-			.agreement-checkbox label {
-				order: 2;
-				width: 100%;
-			}
-		}
-		
-		/* 确保始终居中的备用方案 */
-		.agreement-container-wrapper {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			width: 100%;
-			height: 100%;
-			padding: 20px;
-			box-sizing: border-box;
-		}
-		
-		/* 修复内容过长时的居中问题 */
-		@media (max-height: 600px) {
-			#user-agreement-modal {
-				align-items: flex-start; /* 超小高度时顶部对齐 */
-				padding-top: 20px;
-				overflow-y: auto;
-			}
-			
-			.agreement-container {
-				margin-top: 20px;
-				margin-bottom: 20px;
+			.remember-choice {
+				margin-left: 30px;
 			}
 		}
 		
@@ -564,22 +498,27 @@
 				</div>
 				
 				<div class="agreement-footer">
-					<div>
-						<div class="agreement-checkbox">
-							<input type="checkbox" id="agreeCheckbox">
-							<label for="agreeCheckbox">
-								我已阅读、理解并同意
-							</label>
-						</div>
-						<div class="remember-choice">
-							<input type="checkbox" id="rememberCheckbox">
-							<label for="rememberCheckbox">7天内不再显示此协议</label>
+					<div class="agreement-footer-left">
+						<div class="agreement-checkbox-group">
+							<div class="agreement-checkbox">
+								<input type="checkbox" id="agreeCheckbox">
+								<label for="agreeCheckbox">
+									我已阅读、理解并同意
+									<a href="#" id="showFullTerms">《用户协议与隐私政策》</a>
+								</label>
+							</div>
+							<div class="remember-choice">
+								<input type="checkbox" id="rememberCheckbox">
+								<label for="rememberCheckbox">7天内不再显示此协议</label>
+							</div>
 						</div>
 					</div>
 					
-					<div class="agreement-buttons">
-						<button class="agreement-btn btn-disagree" id="disagreeBtn">不同意</button>
-						<button class="agreement-btn btn-agree" id="agreeBtn" disabled>同意并继续</button>
+					<div class="agreement-footer-right">
+						<div class="agreement-buttons">
+							<button class="agreement-btn btn-disagree" id="disagreeBtn">不同意</button>
+							<button class="agreement-btn btn-agree" id="agreeBtn" disabled>同意并继续</button>
+						</div>
 					</div>
 				</div>
 			</div>
