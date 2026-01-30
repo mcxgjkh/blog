@@ -1258,13 +1258,11 @@
 			
 			// 检查是否应该显示协议
 			function shouldShowAgreement() {
-				// 检查是否已同意
 				const agreed = localStorage.getItem(AGREEMENT_KEY);
 				if (agreed !== 'true') {
-					return true; // 从未同意过，需要显示
+					return true;
 				}
 				
-				// 检查是否选择了记住
 				const remember = localStorage.getItem(REMEMBER_KEY);
 				if (remember === 'true') {
 					const timestamp = localStorage.getItem(TIMESTAMP_KEY);
@@ -1273,14 +1271,11 @@
 						const currentTime = Date.now();
 						const daysPassed = (currentTime - agreedTime) / (1000 * 60 * 60 * 24);
 						
-						// 如果在7天内，不显示协议
 						if (daysPassed <= 7) {
 							return false;
 						}
 					}
 				}
-				
-				// 默认每次都需要显示（除非选择了记住且在有效期内）
 				return true;
 			}
 			
@@ -1289,125 +1284,139 @@
 				document.getElementById('user-agreement-modal').style.display = 'flex';
 				document.getElementById('main-content').style.display = 'none';
 				
-				// 绑定事件
 				setTimeout(() => {
-					// 协议复选框
 					const agreeCheckbox = document.getElementById('agreeCheckbox');
 					const agreeBtn = document.getElementById('agreeBtn');
+					const disagreeBtn = document.getElementById('disagreeBtn');
+					const showFullTermsBtn = document.getElementById('showFullTerms');
+					const rememberCheckbox = document.getElementById('rememberCheckbox');
 					
-					agreeCheckbox.addEventListener('change', function() {
-						agreeBtn.disabled = !this.checked;
-					});
+					// 绑定复选框事件
+					if (agreeCheckbox && agreeBtn) {
+						agreeCheckbox.addEventListener('change', function() {
+							agreeBtn.disabled = !this.checked;
+						});
+					}
 					
-					// 同意按钮 - 修复：确保按钮能点击
-					document.getElementById('agreeBtn').addEventListener('click', function() {
-						acceptAgreement();
-					});
+					// 绑定同意按钮 - 直接传递函数引用
+					if (agreeBtn) {
+						agreeBtn.addEventListener('click', acceptAgreement);
+					}
 					
-					// 不同意按钮
-					document.getElementById('disagreeBtn').addEventListener('click', function() {
-						rejectAgreement();
-					});
+					// 绑定拒绝按钮
+					if (disagreeBtn) {
+						disagreeBtn.addEventListener('click', rejectAgreement);
+					}
 					
-					// 显示完整条款
-					document.getElementById('showFullTerms').addEventListener('click', function(e) {
-						e.preventDefault();
-						// 在实际项目中，这里会打开完整协议页面
-						alert('在实际部署中，这里会打开完整的协议页面');
-					});
+					// 绑定完整条款按钮
+					if (showFullTermsBtn) {
+						showFullTermsBtn.addEventListener('click', function(e) {
+							e.preventDefault();
+							alert('在实际部署中，这里会打开完整的协议页面');
+						});
+					}
 					
-					// 自动聚焦到复选框
-					agreeCheckbox.focus();
+					// 恢复记住选择状态
+					if (rememberCheckbox) {
+						const remember = localStorage.getItem(REMEMBER_KEY);
+						rememberCheckbox.checked = (remember === 'true');
+					}
+					
+					// 自动聚焦
+					if (agreeCheckbox) agreeCheckbox.focus();
 				}, 100);
 			}
 			
-			// 接受协议 - 修复：确保能正常执行
+			// 接受协议 - 修复：安全检查DOM元素
 			function acceptAgreement() {
-				const remember = document.getElementById('rememberCheckbox').checked;
+				// 修复：先获取DOM元素，再使用
+				const rememberCheckbox = document.getElementById('rememberCheckbox');
+				const remember = rememberCheckbox ? rememberCheckbox.checked : false;
 				
 				// 保存用户选择
 				localStorage.setItem(AGREEMENT_KEY, 'true');
 				localStorage.setItem(TIMESTAMP_KEY, Date.now().toString());
 				localStorage.setItem(REMEMBER_KEY, remember.toString());
 				
-				// 隐藏协议弹窗，显示主内容
-				document.getElementById('user-agreement-modal').style.opacity = '0';
-				document.getElementById('user-agreement-modal').style.transition = 'opacity 0.5s ease';
-				
-				setTimeout(() => {
-					document.getElementById('user-agreement-modal').style.display = 'none';
-					document.getElementById('main-content').style.display = 'block';
+				// 隐藏协议弹窗
+				const modal = document.getElementById('user-agreement-modal');
+				if (modal) {
+					modal.style.opacity = '0';
+					modal.style.transition = 'opacity 0.5s ease';
 					
-					// 关键修复：启动页面防护系统
-					// 先尝试调用现有的initializePageProtection函数
-					if (typeof initializePageProtection === 'function') {
-						console.log('调用页面防护系统');
-						initializePageProtection();
-					} else {
-						// 如果函数未定义，等待一下再尝试
-						console.log('页面防护系统函数未找到，等待后重试');
-						setTimeout(() => {
-							if (typeof initializePageProtection === 'function') {
-								initializePageProtection();
-							} else {
-								// 如果还是没有，直接刷新页面
-								console.log('刷新页面以启动防护');
+					setTimeout(() => {
+						modal.style.display = 'none';
+						
+						// 显示主内容
+						const mainContent = document.getElementById('main-content');
+						if (mainContent) {
+							mainContent.style.display = 'block';
+						}
+						
+						// 启动页面防护系统
+						if (typeof initializePageProtection === 'function') {
+							initializePageProtection();
+						} else if (window.initializePageProtection && typeof window.initializePageProtection === 'function') {
+							window.initializePageProtection();
+						} else {
+							// 刷新页面
+							setTimeout(() => {
 								window.location.reload();
-							}
-						}, 300);
-					}
-				}, 500);
+							}, 300);
+						}
+					}, 500);
+				}
 			}
 			
 			// 拒绝协议
 			function rejectAgreement() {
-				// 清空之前的同意记录
 				localStorage.removeItem(AGREEMENT_KEY);
 				localStorage.removeItem(TIMESTAMP_KEY);
 				localStorage.removeItem(REMEMBER_KEY);
 				
-				// 显示拒绝提示
-				document.getElementById('user-agreement-modal').innerHTML = `
-					<div class="agreement-container" style="max-width: 500px;">
-						<div class="agreement-header">
-							<h1>访问被拒绝</h1>
+				const modal = document.getElementById('user-agreement-modal');
+				if (modal) {
+					modal.innerHTML = `
+						<div class="agreement-container" style="max-width: 500px;">
+							<div class="agreement-header">
+								<h1>访问被拒绝</h1>
+							</div>
+							<div class="agreement-content" style="text-align: center; padding: 50px 30px;">
+								<div style="font-size: 60px; color: #dc3545; margin-bottom: 20px;">❌</div>
+								<h2 style="color: #dc3545;">需要同意协议</h2>
+								<p style="color: #666; margin-bottom: 25px;">
+									您需要同意用户协议才能访问本网站。
+								</p>
+								<button onclick="location.reload()" style="
+									padding: 12px 30px;
+									background: #4b6cb7;
+									color: white;
+									border: none;
+									border-radius: 8px;
+									font-size: 16px;
+									cursor: pointer;
+									margin-top: 10px;
+								">
+									重新考虑
+								</button>
+							</div>
 						</div>
-						<div class="agreement-content" style="text-align: center; padding: 50px 30px;">
-							<div style="font-size: 60px; color: #dc3545; margin-bottom: 20px;">❌</div>
-							<h2 style="color: #dc3545;">需要同意协议</h2>
-							<p style="color: #666; margin-bottom: 25px;">
-								您需要同意用户协议才能访问本网站。
-							</p>
-							<button onclick="location.reload()" style="
-								padding: 12px 30px;
-								background: #4b6cb7;
-								color: white;
-								border: none;
-								border-radius: 8px;
-								font-size: 16px;
-								cursor: pointer;
-								margin-top: 10px;
-							">
-								重新考虑
-							</button>
-						</div>
-					</div>
-				`;
+					`;
+				}
 			}
 			
 			// 页面加载时检查
 			if (shouldShowAgreement()) {
-				// 显示协议弹窗
 				showAgreement();
 			} else {
-				// 直接显示主内容
 				document.getElementById('user-agreement-modal').style.display = 'none';
 				document.getElementById('main-content').style.display = 'block';
 				
-				// 启动页面防护系统
 				setTimeout(() => {
 					if (typeof initializePageProtection === 'function') {
 						initializePageProtection();
+					} else if (window.initializePageProtection && typeof window.initializePageProtection === 'function') {
+						window.initializePageProtection();
 					}
 				}, 100);
 			}
@@ -1437,7 +1446,6 @@
                         removeTextSelectionProtection();
                         
                         // 显示一个简单的提示（可选）
-                        showExpiryNotification(remainingSeconds);
                         return true;
                     } else {
                         // 已过期，清理storage

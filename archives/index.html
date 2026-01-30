@@ -704,6 +704,8 @@
 		document.addEventListener('DOMContentLoaded', function() {
 			if (typeof initializePageProtection === 'function') {
 				initializePageProtection();
+			} else if (window.initializePageProtection && typeof window.initializePageProtection === 'function') {
+				window.initializePageProtection();
 			}
 		});
 		
@@ -731,7 +733,6 @@
                         removeTextSelectionProtection();
                         
                         // 显示一个简单的提示（可选）
-                        showExpiryNotification(remainingSeconds);
                         return true;
                     } else {
                         // 已过期，清理storage
