@@ -1,393 +1,11 @@
 <!DOCTYPE html>
-<html 
-	lang="zh-CN">
-	<head>
-		<meta charset="UTF-8" />
-		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		
-<link rel="stylesheet" href="/css/layout.css">
-
-		
-		<title> 满城箫管尽开花 - XiaoMan</title>
-		<!-- <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css" /> -->
-		<!-- <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script> -->
-		
-<link rel="stylesheet" href="/lib/mdui/mdui.min.css">
-
-		
-<script src="/lib/mdui/mdui.min.js"></script>
-
-		<!-- lazyload -->
-		
-<script src="/lib/lazysizes.js"></script>
-
-		<!-- smooth-scrolling -->
-		
-<script src="/lib/smooth-scrolling.js"></script>
-
-		<!-- highlight -->
-		
-<link rel="stylesheet" href="/lib/highlight/atom-one-dark.min.css">
-
-		
-<script src="/lib/highlight/highlight.min.js"></script>
-
-		<!-- 预置 kiraicon -->
-		
-<link rel="stylesheet" href="/lib/iconfont/iconfont.css">
-
-		
-		<link
-			rel="shortcut icon"
-			href="https://blog.mcxgjkh.dpdns.org/images/头像.png"
-			type="image/png"
-		/>
-		
-<link rel="stylesheet" href="/deps/css/APlayer.min.css">
-
-		
-		
-<script src="/deps/js/APlayer.min.js"></script>
-<script src="/deps/js/Meting.min.js"></script>
-
-	<meta name="generator" content="Hexo 7.3.0"></head>
-
-	<style>
-        /* 用户协议弹窗样式 */
-        
-
-		@media print {
-			body * {
-				visibility: hidden !important;
-			}
-			
-			.no-print, .no-print * {
-				display: none !important;
-			}
-		}
-
-		/* 默认：防文字选择 */
-        .protected-content {
-            user-select: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-        }
-
-        /* 防护关闭时：允许文字选择 */
-        .protection-disabled .protected-content {
-            user-select: auto;
-            -webkit-user-select: auto;
-            -moz-user-select: auto;
-            -ms-user-select: auto;
-        }
-	</style>
-
-	<body>
-        
-		
-		<!-- 网站主内容（默认隐藏） -->
-		<div id="main-content" >
-            <div class="protected-content">
-                <div
-                    class="kira-background"
-                    style="background-image: url('https://blog.mcxgjkh.dpdns.org/images/头图.jpg')"
-                ></div>
-                <div class="kira-header">
-    <a
-        class="kira-drawer-button mdui-ripple"
-        title="导航栏"
-        onclick="document.querySelector('.kira-sidebar-modal').classList.add('show');document.querySelector('.kira-sidebar#sidebar').classList.add('show');"
-    >
-        <i class="kirafont icon-menu"></i>
-    </a>
-    <a href="/" title="满城箫管尽开花 - XiaoMan">
-        <img
-			src="https://blog.mcxgjkh.dpdns.org/images/头像.png"
-			alt="MCXGJKH"
-		/>
-    </a>
-</div>
-                <div class="kira-body">
-                    <div class="kira-sidebar" id="sidebar">
-	<div class="kira-avatar mdui-ripple">
-		<a href="https://blog.mcxgjkh.dpdns.org/images/头像.png" title="MCXGJKH">
-			<img
-				src="https://blog.mcxgjkh.dpdns.org/images/头像.png"
-				alt="MCXGJKH"
-			/>
-		</a>
-	</div>
-	<div class="kira-name">
-        满城箫管尽开花
-    </div>
-	<div class="kira-count">
-		<div><span>文章</span>10</div>
-		<div><span>标签</span>2</div>
-		<div><span>分类</span>2</div>
-	</div>
-	<div class="kira-list">
-		
-		<a
-			class="kira-list-item mdui-ripple false"
-			href="/index.html"
-			title="首页"
-		>
-			<i
-				class="kirafont
-					
-						icon-home
-					"
-			></i>
-			<div class="kira-list-item-content">
-				首页
-			</div>
-		</a>
-		
-		<a
-			class="kira-list-item mdui-ripple false"
-			href="/archives/index.html"
-			title="文章"
-		>
-			<i
-				class="kirafont
-					
-						icon-container
-					"
-			></i>
-			<div class="kira-list-item-content">
-				文章
-			</div>
-		</a>
-		
-		<a
-			class="kira-list-item mdui-ripple false"
-			href="/friends/index.html"
-			title="友情链接"
-		>
-			<i
-				class="kirafont
-					
-						icon-link
-					"
-			></i>
-			<div class="kira-list-item-content">
-				友情链接
-			</div>
-		</a>
-		
-		<a
-			class="kira-list-item mdui-ripple false"
-			href="/about/index.html"
-			title="关于我"
-		>
-			<i
-				class="kirafont
-					
-						icon-user
-					"
-			></i>
-			<div class="kira-list-item-content">
-				关于我
-			</div>
-		</a>
-		
-	</div>
-	<aside id="kira-sidebar">
-		
-			<div class="kira-widget-wrap">
-	<div class="kira-widget kira-social">
-		
-			<a
-				class="mdui-ripple"
-				href="https://space.bilibili.com/1401029329"
-				target="_blank"
-				mdui-tooltip="{content: '哔哩哔哩'}"
-				style="color: rgb(231, 106, 141); background-color: rgba(231, 106, 141, .15);"
-			>
-				<i
-					class="kirafont
-					
-						icon-bilibili
-					"
-				></i>
-			</a>
-		
-			<a
-				class="mdui-ripple"
-				href="https://github.com/mcxgjkh/blog"
-				target="_blank"
-				mdui-tooltip="{content: 'GitHub'}"
-				style="color: rgb(25, 23, 23); background-color: rgba(25, 23, 23, .15);"
-			>
-				<i
-					class="kirafont
-					
-						icon-github
-					"
-				></i>
-			</a>
-		
-	</div>
-</div>
-
-		
-			
-  <div class="kira-widget-wrap">
-    <h3 class="kira-widget-title">分类</h3>
-    <div class="kira-widget">
-      <ul class="category-list">
-        
-        
-
-        
-          <li class="category-list-item">
-            <a class="category-list-link" href="/categories/介绍/">
-              介绍
-            </a>
-            <span class="category-list-count">1</span>
-          </li>
-        
-          <li class="category-list-item">
-            <a class="category-list-link" href="/categories/校园/">
-              校园
-            </a>
-            <span class="category-list-count">9</span>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-
-		
-			
-	<div class="kira-widget-wrap">
-		<div id="randomtagcloud" class="kira-widget tagcloud kira-rainbow">
-			<a href="/tags/%E4%BB%8B%E7%BB%8D/" style="font-size: 10px;">介绍</a> <a href="/tags/%E5%B0%8F%E8%AF%B4/" style="font-size: 20px;">小说</a>
-		</div>
-		
-	</div>
-
-
-		
-			
-	<div class="kira-widget-wrap">
-		<h3 class="kira-widget-title">
-			文章归档
-		</h3>
-		<div class="kira-widget">
-			<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/">2026</a><span class="archive-list-count">9</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/">2025</a><span class="archive-list-count">1</span></li></ul>
-		</div>
-	</div>
-
-
-		
-	</aside>
-	<div class="kira-copyright">
-        跨越千年的遇见
-    </div>
-	<div class="kira-copyright">
-		&copy; 2026
-		<a href="/">MCXGJKH</a>
-		Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> &
-		<a href="https://github.com/ch1ny/kira-hexo/" target="_blank">Kira-Hexo</a>
-		<br />
-		
-		
-	</div>
-</div>
-<div
-	class="kira-sidebar-modal"
-	id="sidebar-modal"
-	onclick="(function(self) {
-		self.classList.remove('show');
-		document.querySelector('.kira-sidebar.show#sidebar').classList.remove('show');
-	})(this)"
-></div>
-                    <div class="kira-content">
-                        <div id="kira-top-header"></div>
-                        <div class="kira-main-content">
-                            
-<link rel="stylesheet" href="/css/kira-image.css">
-
-
-<script src="/js/kira-image.js"></script>
-
-<div class="kira-image">
-    <div class="kira-image-modal">
-        <div class="kira-image-header">
-            <div class="kira-image-counter"></div>
-            <div class="kira-image-title"></div>
-            <div class="kira-image-operation">
-                <div class="kira-image-operation-button" id="kira-image-operation-button-zoom">
-                    <i class="kirafont icon-zoom-in"></i>
-                </div>
-                <div class="kira-image-operation-button" id="kira-image-operation-button-close">
-                    <i class="kirafont icon-close"></i>
-                </div>
-            </div>
-        </div>
-        <div class="kira-image-container">
-            <div class="kira-image-prev-button-panel">
-                <div class="kira-image-exchange-button">
-                    <i class="kirafont icon-left"></i>
-                </div>
-            </div>
-            <div class="kira-image-list">
-                <div class="kira-image-prev">
-                    <img />
-                </div>
-                <div class="kira-image-now">
-                    <img />
-                </div>
-                <div class="kira-image-next">
-                    <img />
-                </div>
-            </div>
-            <div class="kira-image-next-button-panel">
-                <div class="kira-image-exchange-button">
-                    <i class="kirafont icon-right"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-	
-<link rel="stylesheet" href="/css/kira-code-copy.css">
-
-	
-<script src="/js/kira-code-copy.js"></script>
-
-
-<div class="kira-post">
-	<article>
-		
-		<div
-			class="kira-post-cover"
-			style="padding-bottom: '56.25%'"
-		>
-			<img
-				data-src="https://blog.mcxgjkh.dpdns.org/images/头图.jpg"
-				data-sizes="auto"
-				alt=""
-				class="lazyload kira-post-cover-image disabled-kira-image"
-			/>
-			<h1></h1>
-		</div>
-		
-		<div class="kira-post-meta kira-rainbow" style="margin:10px 0!important;">
-			<a><i class="kirafont icon-calendar-fill"></i>2026年01月30日</a>
-			<a><i class="kirafont icon-edit-fill"></i>3.1k 字</a>
-			<a><i class="kirafont icon-time-circle-fill"></i>大概 16 分钟</a>
-		</div>
-		<!DOCTYPE html><html lang="zh-CN"><head>
+<html lang="zh-CN">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>用户协议与隐私政策 | Blog_MCXGJKH</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-color: #4361ee;
@@ -1006,7 +624,7 @@
                     <i class="fas fa-shield-alt"></i>
                 </div>
                 <div class="logo-text">
-                    <h1><span id="%E7%94%A8%E6%88%B7%E5%8D%8F%E8%AE%AE%E4%B8%8E%E9%9A%90%E7%A7%81%E6%94%BF%E7%AD%96">用户协议与隐私政策</span></h1>
+                    <h1>用户协议与隐私政策</h1>
                     <p>保护您的隐私与权益是我们的首要责任</p>
                 </div>
             </div>
@@ -1058,7 +676,7 @@
                     <div class="section-icon">
                         <i class="fas fa-file-contract"></i>
                     </div>
-                    <h2 class="section-title"><span id="%E6%9C%8D%E5%8A%A1%E4%BD%BF%E7%94%A8%E5%8D%8F%E8%AE%AE">服务使用协议</span></h2>
+                    <h2 class="section-title">服务使用协议</h2>
                 </div>
                 
                 <p class="section-text">欢迎使用我们的服务。在开始使用前，请仔细阅读本协议。本协议构成您与我们之间的法律合同，规定了您使用我们服务的条款和条件。</p>
@@ -1071,7 +689,7 @@
                     <p class="section-text">在注册或使用我们的服务之前，您必须仔细阅读并同意本协议的所有条款。如果您不同意任何条款，请立即停止使用我们的服务。</p>
                 </div>
                 
-                <h3 class="section-subtitle"><span id="%E7%94%A8%E6%88%B7%E6%9D%83%E5%88%A9%E4%B8%8E%E4%B9%89%E5%8A%A1">用户权利与义务</span></h3>
+                <h3 class="section-subtitle">用户权利与义务</h3>
                 
                 <div class="list-container">
                     <div class="list-item">
@@ -1094,7 +712,7 @@
                     </div>
                 </div>
                 
-                <h3 class="section-subtitle"><span id="%E6%9C%8D%E5%8A%A1%E6%9D%A1%E6%AC%BE">服务条款</span></h3>
+                <h3 class="section-subtitle">服务条款</h3>
                 
                 <table class="data-table">
                     <thead>
@@ -1130,7 +748,7 @@
                     <div class="section-icon">
                         <i class="fas fa-user-shield"></i>
                     </div>
-                    <h2 class="section-title"><span id="%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4%E6%94%BF%E7%AD%96">隐私保护政策</span></h2>
+                    <h2 class="section-title">隐私保护政策</h2>
                 </div>
                 
                 <p class="section-text">我们非常重视您的隐私。本隐私政策解释了我们会收集哪些信息、如何使用这些信息以及如何保护您的个人信息。</p>
@@ -1140,26 +758,26 @@
                         <div class="card-icon">
                             <i class="fas fa-info-circle"></i>
                         </div>
-                        <h3 class="card-title"><span id="%E6%88%91%E4%BB%AC%E6%94%B6%E9%9B%86%E7%9A%84%E4%BF%A1%E6%81%AF">我们收集的信息</span></h3>
+                        <h3 class="card-title">我们收集的信息</h3>
                         <p class="card-text">包括您主动提供的信息（如注册信息）、自动收集的信息（如设备信息和日志数据）以及从第三方获得的信息。</p>
                     </div>
                     <div class="card">
                         <div class="card-icon">
                             <i class="fas fa-cogs"></i>
                         </div>
-                        <h3 class="card-title"><span id="%E4%BF%A1%E6%81%AF%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F">信息使用方式</span></h3>
+                        <h3 class="card-title">信息使用方式</h3>
                         <p class="card-text">用于提供服务、改进产品、与您沟通、确保安全以及遵守法律要求。我们不会将您的个人信息出售给第三方。</p>
                     </div>
                     <div class="card">
                         <div class="card-icon">
                             <i class="fas fa-share-alt"></i>
                         </div>
-                        <h3 class="card-title"><span id="%E4%BF%A1%E6%81%AF%E5%85%B1%E4%BA%AB%E6%83%85%E5%86%B5">信息共享情况</span></h3>
+                        <h3 class="card-title">信息共享情况</h3>
                         <p class="card-text">仅在必要情况下与我们的服务提供商共享，或为遵守法律要求、保护我们的权利而共享。</p>
                     </div>
                 </div>
                 
-                <h3 class="section-subtitle"><span id="%E6%82%A8%E7%9A%84%E9%9A%90%E7%A7%81%E6%9D%83%E5%88%A9">您的隐私权利</span></h3>
+                <h3 class="section-subtitle">您的隐私权利</h3>
                 
                 <div class="toggle-container">
                     <div class="toggle-header">
@@ -1192,7 +810,7 @@
                     <div class="section-icon">
                         <i class="fas fa-lock"></i>
                     </div>
-                    <h2 class="section-title"><span id="%E6%95%B0%E6%8D%AE%E5%AE%89%E5%85%A8%E4%BF%9D%E9%9A%9C">数据安全保障</span></h2>
+                    <h2 class="section-title">数据安全保障</h2>
                 </div>
 
                 <div class="highlight-box">
@@ -1229,7 +847,7 @@
                     <div class="section-icon">
                         <i class="fas fa-cookie"></i>
                     </div>
-                    <h2 class="section-title"><span id="cookie%E4%B8%8E%E8%BF%BD%E8%B8%AA%E6%8A%80%E6%9C%AF">Cookie与追踪技术</span></h2>
+                    <h2 class="section-title">Cookie与追踪技术</h2>
                 </div>
                 
                 <p class="section-text">我们使用Cookie和类似技术来提升用户体验、分析网站流量和提供个性化服务。</p>
@@ -1271,7 +889,7 @@
                     <div class="section-icon">
                         <i class="fas fa-balance-scale"></i>
                     </div>
-                    <h2 class="section-title"><span id="%E6%B3%95%E5%BE%8B%E4%B8%8E%E8%B4%A3%E4%BB%BB">法律与责任</span></h2>
+                    <h2 class="section-title">法律与责任</h2>
                 </div>
                 
                 <div class="list-container">
@@ -1302,7 +920,7 @@
                     <div class="section-icon">
                         <i class="fas fa-question-circle"></i>
                     </div>
-                    <h2 class="section-title"><span id="%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E8%A7%A3%E7%AD%94">常见问题解答</span></h2>
+                    <h2 class="section-title">常见问题解答</h2>
                 </div>
                 
                 <div class="toggle-container">
@@ -1455,422 +1073,5 @@
             document.head.appendChild(style);
         });
     </script>
-
-</body></html>
-	</article>
-
-	 
-    <div class="kira-post-copyright">
-        <strong>本文作者：</strong>MCXGJKH<br>
-        <strong>本文链接：</strong><a href="https://blog.mcxgjkh.dpdns.org/static-pages/agreement.html" title="https:&#x2F;&#x2F;blog.mcxgjkh.dpdns.org&#x2F;static-pages&#x2F;agreement.html" target="_blank" rel="noopener">https:&#x2F;&#x2F;blog.mcxgjkh.dpdns.org&#x2F;static-pages&#x2F;agreement.html</a><br>
-        
-            <strong>版权声明：</strong>本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans" target="_blank">CC BY-NC-SA 4.0</a> 协议进行许可，著作权归作者所有。<br> &emsp;&emsp;&emsp;&emsp;&emsp;未经作者授权，禁止转载。<br> &emsp;&emsp;&emsp;&emsp;&emsp;商业转载请联系作者获得授权，非商业转载请完整注明出处，并同样以 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans" target="_blank">CC BY-NC-SA 4.0</a> 协议发布
-        
-    </div>
-
-  
-	<div class="kira-post-meta kira-rainbow">
-		
-		
-	</div>
-	
-	<div class="kira-post-footer">
-		
-
-		
-	</div>
-	
-</div>
-
-                        </div>
-                    </div>
-                    <div class="kira-right-column">
-	<a onclick="document.querySelector('#kira-top-header').scrollIntoView({behavior: 'smooth'});" class="kira-backtotop" aria-label="回到顶部" title="回到顶部">
-		<button class="mdui-fab mdui-ripple">
-			<i class="kirafont icon-caret-up"></i>
-		</button>
-	</a>
-</div>
-
-                </div>
-            </div>
-        </div>
-	</body>
-
-	<script>
-        // 用户协议管理（只在首页执行）
-		
-		// 非首页：直接显示内容并启动防护
-		document.addEventListener('DOMContentLoaded', function() {
-			if (typeof initializePageProtection === 'function') {
-				initializePageProtection();
-			} else if (window.initializePageProtection && typeof window.initializePageProtection === 'function') {
-				window.initializePageProtection();
-			}
-		});
-		
-
-        // 页面加载时立即检查防护状态
-        (function() {
-            // 密码配置
-            const ADMIN_PASSWORD = "homo114514";
-            const PROTECTION_EXPIRY_KEY = "protection_expiry";
-            
-            // 检查是否在有效期内（只在页面加载时调用一次）
-            function isWithinProtectionWindow() {
-                const expiry = localStorage.getItem(PROTECTION_EXPIRY_KEY);
-                
-                if (expiry) {
-                    const expiryTime = parseInt(expiry);
-                    const currentTime = Date.now();
-                    
-                    if (currentTime < expiryTime) {
-                        // 在有效期内，不启动防护
-                        const remainingSeconds = Math.round((expiryTime - currentTime) / 1000);
-                        console.log(`防护已关闭`);
-                        
-                        // 关键：移除文字选择限制
-                        removeTextSelectionProtection();
-                        
-                        // 显示一个简单的提示（可选）
-                        return true;
-                    } else {
-                        // 已过期，清理storage
-                        localStorage.removeItem(PROTECTION_EXPIRY_KEY);
-                        // 确保文字选择限制生效
-                        addTextSelectionProtection();
-                    }
-                } else {
-                    // 没有存储，确保文字选择限制生效
-                    addTextSelectionProtection();
-                }
-                return false;
-            }
-            
-            // 移除文字选择限制
-            function removeTextSelectionProtection() {
-                // 方法1：添加一个标记类来覆盖样式
-                document.documentElement.classList.add('protection-disabled');
-                
-                // 方法2：直接修改所有protected-content元素的样式
-                setTimeout(() => {
-                    const elements = document.querySelectorAll('.protected-content');
-                    elements.forEach(el => {
-                        el.style.userSelect = 'auto';
-                        el.style.webkitUserSelect = 'auto';
-                        el.style.mozUserSelect = 'auto';
-                        el.style.msUserSelect = 'auto';
-                    });
-                }, 100);
-            }
-            
-            // 添加文字选择限制
-            function addTextSelectionProtection() {
-                // 移除标记类
-                document.documentElement.classList.remove('protection-disabled');
-                
-                // 确保CSS类生效
-                setTimeout(() => {
-                    const elements = document.querySelectorAll('.protected-content');
-                    elements.forEach(el => {
-                        el.style.userSelect = '';
-                        el.style.webkitUserSelect = '';
-                        el.style.mozUserSelect = '';
-                        el.style.msUserSelect = '';
-                    });
-                }, 100);
-            }
-            
-            // 如果还在有效期内，直接跳过所有防护代码
-            if (isWithinProtectionWindow()) {
-                return; // 重要：直接退出，不执行下面的防护代码
-            }
-            
-            // =========== 以下是防护代码（只在未验证或已过期时执行） ===========
-            
-            // 确保文字选择限制生效
-            addTextSelectionProtection();
-            
-            // 显示密码输入界面
-            function showPasswordInput() {
-                // 清屏并显示密码输入界面
-                document.body.innerHTML = `
-                <div id="fullscreen-warning" style="
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-                    z-index: 999999;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    font-family: system-ui, -apple-system, sans-serif;
-                ">
-                    <div style="
-                        text-align: center;
-                        max-width: 500px;
-                        width: 90%;
-                        padding: 40px 30px;
-                        background: white;
-                        border-radius: 15px;
-                        box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-                        animation: slideIn 0.5s ease;
-                    ">
-                        <div style="
-                            font-size: 60px;
-                            color: #dc3545;
-                            margin-bottom: 20px;
-                        ">⚠️</div>
-                        
-                        <h2 style="color: #dc3545; margin-bottom: 10px;">安全提醒</h2>
-                        
-                        <div style="
-                            background: #fff9e6;
-                            border-left: 4px solid #ffc107;
-                            padding: 15px;
-                            margin: 20px 0;
-                            border-radius: 8px;
-                            text-align: left;
-                        ">
-                            <p style="margin-bottom: 8px; color: #856404;">
-                                <strong>检测到安全防护已触发：</strong>
-                            </p>
-                            <ul style="margin: 10px 0 10px 20px; color: #856404;">
-                                <li>开发者工具可能已打开</li>
-                                <li>或您正试图打印/保存此网站</li>
-                                <li>或触发了其他安全保护机制</li>
-                            </ul>
-                        </div>
-                        
-                        <p style="color: #666; margin-bottom: 25px; line-height: 1.6;">
-                            为保证内容安全，页面功能已被限制。<br>
-                            如需临时关闭防护，请输入管理员密码：
-                        </p>
-                        
-                        <div style="margin: 25px 0;">
-                            <input 
-                                type="password" 
-                                id="adminPasswordInput"
-                                placeholder="请输入管理员密码"
-                                style="
-                                    width: 100%;
-                                    padding: 14px 18px;
-                                    border: 2px solid #e0e0e0;
-                                    border-radius: 8px;
-                                    font-size: 16px;
-                                    transition: all 0.3s;
-                                    box-sizing: border-box;
-                                "
-                                onfocus="this.style.borderColor='#4b6cb7';"
-                                onblur="this.style.borderColor='#e0e0e0';"
-                            />
-                            <div id="passwordError" style="
-                                color: #dc3545;
-                                font-size: 14px;
-                                margin-top: 10px;
-                                min-height: 20px;
-                                text-align: left;
-                            "></div>
-                        </div>
-                        
-                        <div style="
-                            display: flex;
-                            gap: 15px;
-                            margin-top: 25px;
-                        ">
-                            <button id="refreshBtn" style="
-                                flex: 1;
-                                padding: 14px 20px;
-                                background: #f8f9fa;
-                                color: #666;
-                                border: 2px solid #ddd;
-                                border-radius: 8px;
-                                font-size: 16px;
-                                font-weight: 500;
-                                cursor: pointer;
-                                transition: all 0.3s;
-                            " onmouseover="this.style.background='#e9ecef';"
-                               onmouseout="this.style.background='#f8f9fa';">
-                                刷新页面
-                            </button>
-                            
-                            <button id="submitBtn" style="
-                                flex: 1;
-                                padding: 14px 20px;
-                                background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
-                                color: white;
-                                border: none;
-                                border-radius: 8px;
-                                font-size: 16px;
-                                font-weight: 500;
-                                cursor: pointer;
-                                transition: all 0.3s;
-                                box-shadow: 0 4px 15px rgba(75, 108, 183, 0.3);
-                            " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(75, 108, 183, 0.4)';"
-                               onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(75, 108, 183, 0.3)';">
-                                确认密码
-                            </button>
-                        </div>
-                        
-                        <div style="
-                            margin-top: 25px;
-                            padding-top: 20px;
-                            border-top: 1px solid #eee;
-                            color: #999;
-                            font-size: 13px;
-                        ">
-                            <p id="passwordHint">⚠️ 密码验证后防护将关闭30秒，之后需重新输入</p>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // 添加CSS动画
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes slideIn {
-                    from { opacity: 0; transform: translateY(30px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-                @keyframes slideInRight {
-                    from { transform: translateX(100%); opacity: 0; }
-                    to { transform: translateX(0); opacity: 1; }
-                }
-                @keyframes slideOutRight {
-                    from { transform: translateX(0); opacity: 1; }
-                    to { transform: translateX(100%); opacity: 0; }
-                }
-                @keyframes shake {
-                    0%, 100% { transform: translateX(0); }
-                    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-                    20%, 40%, 60%, 80% { transform: translateX(5px); }
-                }
-            `;
-            
-            // 绑定按钮事件
-            setTimeout(() => {
-                document.getElementById('refreshBtn').onclick = () => location.reload();
-                document.getElementById('submitBtn').onclick = checkPassword;
-                document.getElementById('adminPasswordInput').onkeypress = (e) => {
-                    if (e.key === 'Enter') checkPassword();
-                };
-                document.getElementById('adminPasswordInput').focus();
-            }, 100);
-        }
-        
-        // 检查密码
-        function checkPassword() {
-            const input = document.getElementById('adminPasswordInput');
-            const errorDiv = document.getElementById('passwordError');
-            const password = input.value.trim();
-            
-            if (!password) {
-                errorDiv.textContent = '请输入密码';
-                return;
-            }
-            
-            if (password === ADMIN_PASSWORD) {
-                // 密码正确 - 设置30秒有效期
-                const expiryTime = Date.now() + (30 * 1000);
-                localStorage.setItem(PROTECTION_EXPIRY_KEY, expiryTime.toString());
-                
-                // 立即移除文字选择限制
-                removeTextSelectionProtection();
-                
-                errorDiv.textContent = '✓ 密码正确，正在重新加载...';
-                errorDiv.style.color = '#28a745';
-                
-                // 1秒后刷新页面
-                setTimeout(() => {
-                    location.reload();
-                }, 1000);
-            } else {
-                errorDiv.textContent = '✗ 密码错误';
-                input.value = '';
-                input.focus();
-            }
-        }
-        
-        // =========== 防护事件监听器 ===========
-        
-        // 快捷键防护
-        document.addEventListener('keydown', function(e) {
-            const blockedKeys = ['F12', 'F8'];
-            const blockedCombinations = [
-                (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)),
-                (e.metaKey && e.altKey && e.key === 'I'),
-                (e.ctrlKey && e.key === 'u'),
-                (e.ctrlKey && e.key === 's'),
-                (e.ctrlKey && e.key === 'p')
-            ];
-            
-            if (blockedKeys.includes(e.key) || blockedCombinations.some(combo => combo)) {
-                e.preventDefault();
-                e.stopPropagation();
-                showPasswordInput();
-                return false;
-            }
-        });
-        
-        // 右键防护
-        document.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-            showPasswordInput();
-            return false;
-        });
-        
-        // 选择防护
-        document.addEventListener('selectstart', function(e) {
-            e.preventDefault();
-            return false;
-        });
-        
-        // 拖拽防护
-        document.addEventListener('dragstart', function(e) {
-            e.preventDefault();
-            return false;
-        });
-        
-        })(); // 立即执行函数结束
-
-        // DOM加载后的附加防护
-        document.addEventListener('DOMContentLoaded', function() {
-            // 如果已经在有效期内，跳过这些防护
-            const expiry = localStorage.getItem("protection_expiry");
-            if (expiry && Date.now() < parseInt(expiry)) {
-                // 移除文字选择限制
-                setTimeout(() => {
-                    const elements = document.querySelectorAll('.protected-content');
-                    elements.forEach(el => {
-                        el.style.userSelect = 'auto';
-                        el.style.webkitUserSelect = 'auto';
-                        el.style.mozUserSelect = 'auto';
-                        el.style.msUserSelect = 'auto';
-                    });
-                }, 100);
-                return;
-            }
-            
-            // 防打印
-            window.onbeforeprint = function() {
-                document.dispatchEvent(new KeyboardEvent('keydown', {
-                    key: 'p',
-                    ctrlKey: true
-                }));
-                return false;
-            };
-            
-            // 防PrintScreen
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'PrintScreen') {
-                    e.preventDefault();
-                    const event = new Event('contextmenu');
-                    document.dispatchEvent(event);
-                    return false;
-                }
-            });
-        });
-    </script>
+</body>
 </html>
