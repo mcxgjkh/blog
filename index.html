@@ -249,16 +249,178 @@
 			box-shadow: none;
 		}
 		
-		.remember-choice {
-			display: flex;
-			align-items: center;
-			gap: 12px;
-			margin-top: 12px;
+		/* 响应式设计 */
+		@media (max-width: 768px) {
+			#user-agreement-modal {
+				padding: 15px;
+				align-items: flex-start;
+				overflow-y: auto;
+			}
+			
+			.agreement-container {
+				max-height: 85vh;
+				margin-top: 5vh;
+				border-radius: 15px;
+			}
+			
+			.agreement-header {
+				padding: 20px 25px;
+			}
+			
+			.agreement-header h1 {
+				font-size: 22px;
+				margin-bottom: 6px;
+			}
+			
+			.agreement-header p {
+				font-size: 13px;
+			}
+			
+			.agreement-content {
+				padding: 20px 25px;
+			}
+			
+			.agreement-content h2 {
+				font-size: 18px;
+				margin: 20px 0 12px 0;
+			}
+			
+			.agreement-content h3 {
+				font-size: 15px;
+				margin: 18px 0 9px 0;
+			}
+			
+			.agreement-content p {
+				font-size: 14px;
+				text-align: left;
+			}
+			
+			.agreement-content li {
+				font-size: 14px;
+			}
+			
+			.agreement-footer {
+				padding: 20px 25px;
+				flex-direction: column;
+				gap: 20px;
+			}
+			
+			.agreement-footer-left {
+				min-width: 100%;
+				order: 2;
+			}
+			
+			.agreement-footer-right {
+				width: 100%;
+				order: 1;
+			}
+			
+			.agreement-buttons {
+				flex-direction: column;
+				gap: 12px;
+				width: 100%;
+			}
+			
+			.agreement-btn {
+				width: 100%;
+				min-width: 0;
+				padding: 16px;
+			}
+			
+			.agreement-checkbox {
+				align-items: flex-start;
+				gap: 10px;
+			}
+			
+			.agreement-checkbox label {
+				font-size: 14px;
+				line-height: 1.5;
+			}
+			
+			.remember-choice label {
+				font-size: 13px;
+			}
+			
+			.warning-box {
+				padding: 15px;
+				margin: 15px 0;
+			}
+			
+			.terms-scroll {
+				padding: 15px;
+				max-height: 200px;
+				font-size: 13px;
+			}
 		}
 		
-		.remember-choice label {
-			font-size: 14px;
-			color: #666;
+		@media (max-width: 480px) {
+			#user-agreement-modal {
+				padding: 10px;
+			}
+			
+			.agreement-container {
+				max-height: 90vh;
+				margin-top: 5vh;
+				border-radius: 12px;
+			}
+			
+			.agreement-header {
+				padding: 18px 20px;
+			}
+			
+			.agreement-header h1 {
+				font-size: 20px;
+			}
+			
+			.agreement-content {
+				padding: 18px 20px;
+			}
+			
+			.agreement-content h2 {
+				font-size: 17px;
+			}
+			
+			.agreement-content h3 {
+				font-size: 14px;
+			}
+			
+			.agreement-footer {
+				padding: 18px 20px;
+			}
+			
+			.agreement-checkbox label {
+				font-size: 13px;
+			}
+			
+			.remember-choice label {
+				font-size: 12px;
+			}
+		}
+		
+		/* 超小屏幕特殊处理 */
+		@media (max-width: 360px) {
+			.agreement-header h1 {
+				font-size: 18px;
+			}
+			
+			.agreement-header p {
+				font-size: 12px;
+			}
+			
+			.agreement-checkbox {
+				flex-direction: column;
+				align-items: flex-start;
+				gap: 8px;
+			}
+			
+			.agreement-checkbox input[type="checkbox"] {
+				order: 1;
+			}
+			
+			.agreement-checkbox label {
+				order: 2;
+				width: 100%;
+			}
 		}
 		
 		/* 动画 */
