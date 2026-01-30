@@ -945,7 +945,7 @@
                     <i class="fas fa-check-circle"></i>
                     <span>接受全部条款</span>
                 </button>
-                <button class="action-btn btn-secondary" id="downloadBtn">
+                <button class="action-btn btn-secondary" id="lightweightPdfBtn">
                     <i class="fas fa-download"></i>
                     <span>下载PDF版本</span>
                 </button>
@@ -957,7 +957,223 @@
         </footer>
     </div>
 
+    <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
     <script>
+        // 等待页面加载完成
+        window.addEventListener('load', function() {
+            const pdfBtn = document.getElementById('lightweightPdfBtn');
+            
+            if (pdfBtn) {
+                pdfBtn.addEventListener('click', function() {
+                    generateLightweightPDF();
+                });
+                
+                // 也可以添加右键菜单选项
+                pdfBtn.addEventListener('contextmenu', function(e) {
+                    e.preventDefault();
+                    generateLightweightPDF(true); // 高质量版本
+                });
+            }
+        });
+
+        function generateLightweightPDF(highQuality = false) {
+            const btn = document.getElementById('lightweightPdfBtn');
+            const originalText = btn.textContent;
+            
+            // 显示加载状态
+            btn.textContent = '正在生成...';
+            btn.classList.add('loading');
+            btn.disabled = true;
+            
+            try {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: "portrait",
+                    unit: "mm",
+                    format: "a4",
+                    compress: true // 启用压缩
+                });
+                
+                // 设置PDF元数据（极小开销）
+                pdf.setProperties({
+                    title: '用户协议',
+                    subject: '正式版协议',
+                    author: document.title || '网站',
+                    keywords: '用户协议,隐私政策',
+                    creator: '轻量PDF生成器'
+                });
+                
+                // 从页面提取纯文本内容
+                const getPageText = () => {
+                    // 提取主要文本内容
+                    const contentElement = document.querySelector('.agreement-content') || 
+                                        document.querySelector('.agreement-container') || 
+                                        document.body;
+                    
+                    // 获取纯文本，移除不必要的元素
+                    const clone = contentElement.cloneNode(true);
+                    
+                    // 移除不需要的元素
+                    const toRemove = clone.querySelectorAll('script, style, .pdf-download-btn, .lightweight-btn, .no-print');
+                    toRemove.forEach(el => el.remove());
+                    
+                    // 提取文本并清理
+                    let text = clone.textContent || clone.innerText || '';
+                    
+                    // 清理文本
+                    text = text.replace(/\s+/g, ' ')  // 合并空白字符
+                            .replace(/\n{3,}/g, '\n\n')  // 限制空行数量
+                            .trim();
+                    
+                    return text;
+                };
+                
+                const text = getPageText();
+                
+                // PDF生成设置
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const margin = 20;
+                const maxWidth = pageWidth - 2 * margin;
+                
+                // 设置字体（jsPDF内置字体，无需下载）
+                pdf.setFont("helvetica");
+                pdf.setFontSize(highQuality ? 11 : 10);
+                pdf.setTextColor(0, 0, 0); // 黑色
+                
+                // 添加标题
+                pdf.setFontSize(16);
+                pdf.setFont("helvetica", "bold");
+                pdf.text("用户协议与隐私政策", pageWidth / 2, 20, { align: "center" });
+                
+                // 添加生成时间
+                pdf.setFontSize(10);
+                pdf.setFont("helvetica", "normal");
+                const dateStr = new Date().toLocaleDateString('zh-CN');
+                pdf.text(`生成时间: ${dateStr}`, margin, 30);
+                
+                // 画一条分隔线
+                pdf.setLineWidth(0.5);
+                pdf.line(margin, 35, pageWidth - margin, 35);
+                
+                // 添加主要内容
+                pdf.setFontSize(highQuality ? 11 : 10);
+                let yPos = 45;
+                let page = 1;
+                
+                // 简单的文本分页
+                const lines = pdf.splitTextToSize(text, maxWidth);
+                
+                for (let i = 0; i < lines.length; i++) {
+                    // 检查是否需要新页面
+                    if (yPos > 270) { // A4页面底部边界
+                        pdf.addPage();
+                        page++;
+                        yPos = 20;
+                        
+                        // 在新页面添加页眉
+                        pdf.setFontSize(10);
+                        pdf.text(`用户协议 - 第 ${page} 页`, pageWidth / 2, 10, { align: "center" });
+                    }
+                    
+                    // 添加文本行
+                    pdf.text(lines[i], margin, yPos);
+                    yPos += highQuality ? 6 : 5; // 行高
+                }
+                
+                // 添加页脚
+                const totalPages = page;
+                for (let p = 1; p <= totalPages; p++) {
+                    pdf.setPage(p);
+                    pdf.setFontSize(8);
+                    pdf.text(`第 ${p} 页 / 共 ${totalPages} 页`, pageWidth / 2, 287, { align: "center" });
+                }
+                
+                // 生成文件名
+                const fileName = `用户协议_${new Date().toISOString().slice(0,10)}_${highQuality ? '详细版' : '精简版'}.pdf`;
+                
+                // 保存PDF（直接下载，不生成Blob URL节省内存）
+                pdf.save(fileName);
+                
+                // 显示成功提示（不下载额外资源）
+                showLightweightSuccess();
+                
+            } catch (error) {
+                console.error('PDF生成错误:', error);
+                // 使用最轻量的错误提示
+                const errorMsg = document.createElement('div');
+                errorMsg.textContent = '生成失败，请重试';
+                errorMsg.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #e74c3c;
+                    color: white;
+                    padding: 10px 15px;
+                    border-radius: 5px;
+                    z-index: 1001;
+                    font-size: 14px;
+                `;
+                document.body.appendChild(errorMsg);
+                setTimeout(() => errorMsg.remove(), 3000);
+            } finally {
+                // 恢复按钮状态
+                btn.textContent = originalText;
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            }
+        }
+
+        function showLightweightSuccess() {
+            // 创建极简的成功提示
+            const success = document.createElement('div');
+            success.textContent = '✓ PDF下载已开始';
+            success.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #27ae60;
+                color: white;
+                padding: 10px 15px;
+                border-radius: 5px;
+                z-index: 1001;
+                font-size: 14px;
+                animation: fadeInOut 3s ease;
+            `;
+            
+            // 添加极简动画
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fadeInOut {
+                    0% { opacity: 0; transform: translateY(-10px); }
+                    10% { opacity: 1; transform: translateY(0); }
+                    90% { opacity: 1; transform: translateY(0); }
+                    100% { opacity: 0; transform: translateY(-10px); }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.body.appendChild(success);
+            setTimeout(() => success.remove(), 3000);
+        }
+
+        // 可选：添加离线检测和降级方案
+        function checkOnlineStatus() {
+            if (!navigator.onLine) {
+                const btn = document.getElementById('lightweightPdfBtn');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.title = '需要网络连接才能生成PDF';
+                    btn.style.opacity = '0.5';
+                }
+            }
+        }
+
+        // 检测网络状态
+        window.addEventListener('online', checkOnlineStatus);
+        window.addEventListener('offline', checkOnlineStatus);
+        checkOnlineStatus();
+
         document.addEventListener('DOMContentLoaded', function() {
             // 导航链接点击效果
             const navLinks = document.querySelectorAll('.nav-link');
