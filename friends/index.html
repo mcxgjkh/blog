@@ -54,9 +54,10 @@
 	<meta name="generator" content="Hexo 7.3.0"></head>
 
 	<style>
-        /* 用户协议弹窗样式 */
-        
+		/* 用户协议弹窗样式 */
+		
 
+		/* 打印样式 */
 		@media print {
 			body * {
 				visibility: hidden !important;
@@ -67,21 +68,21 @@
 			}
 		}
 
-		/* 默认：防文字选择 */
-        .protected-content {
-            user-select: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-        }
+		/* 文字选择保护 */
+		.protected-content {
+			user-select: none;
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+		}
 
-        /* 防护关闭时：允许文字选择 */
-        .protection-disabled .protected-content {
-            user-select: auto;
-            -webkit-user-select: auto;
-            -moz-user-select: auto;
-            -ms-user-select: auto;
-        }
+		/* 防护关闭时：允许文字选择 */
+		.protection-disabled .protected-content {
+			user-select: auto;
+			-webkit-user-select: auto;
+			-moz-user-select: auto;
+			-ms-user-select: auto;
+		}
 	</style>
 
 	<body>
@@ -427,6 +428,7 @@
 	<script>
         // 用户协议管理（只在首页执行）
 		
+
 		// 非首页：直接显示内容并启动防护
 		document.addEventListener('DOMContentLoaded', function() {
 			if (typeof initializePageProtection === 'function') {
