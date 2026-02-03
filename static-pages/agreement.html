@@ -1150,374 +1150,349 @@
     <script>
         // PDF生成方案
         async function generateChinesePDF2(event) {
+            // 阻止事件冒泡和默认行为
+            event.preventDefault();
+            event.stopPropagation();
+            
             const btn = event.currentTarget;
+            
+            // 检查是否正在生成
+            if (btn.classList.contains('generating')) {
+                return;
+            }
             
             // 保存原始状态
             const originalHTML = btn.innerHTML;
             
-            // 显示生成中状态
+            // 标记为生成中
+            btn.classList.add('generating');
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>生成中...</span>';
             btn.disabled = true;
             
             try {
-                // 获取完整内容（包括下拉框内容）
-                const pdfContent = getCompleteChineseContent();
+                // 获取完整内容
+                const pdfContent = await getCompleteChineseContent();
                 
-                // 创建PDF
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
+                // 生成文件名
+                const timestamp = new Date().getTime();
+                const filename = `用户协议_${timestamp}.pdf`;
                 
-                // 设置中文字体（使用内置字体避免乱码）
-                doc.setFont("helvetica");
-                doc.setFontSize(16);
-                
-                // 标题
-                doc.text("用户协议与隐私政策", 20, 20);
-                
-                // 元信息
-                doc.setFontSize(10);
-                doc.text(`生成时间：${new Date().toLocaleDateString('zh-CN')}`, 20, 30);
-                doc.text(`最后更新：2026年1月30日`, 20, 36);
-                
-                // 开始添加内容
-                doc.setFontSize(12);
-                let y = 50;
-                const lineHeight = 7;
-                const pageWidth = 170;
-                
-                // 分割并添加内容
-                const lines = doc.splitTextToSize(pdfContent, pageWidth);
-                
-                for (let i = 0; i < lines.length; i++) {
-                    if (y > 280) {
-                        doc.addPage();
-                        y = 20;
-                    }
-                    
-                    // 检查是否是标题行
-                    if (lines[i].match(/^[一二三四五六]、|^[0-9]+\./)) {
-                        doc.setFont("helvetica", "bold");
-                        doc.text(lines[i], 20, y);
-                        doc.setFont("helvetica", "normal");
-                    } else if (lines[i].match(/^[A-Z].+：$/)) {
-                        doc.setFont("helvetica", "bold");
-                        doc.text(lines[i], 20, y);
-                        doc.setFont("helvetica", "normal");
-                    } else {
-                        doc.text(lines[i], 20, y);
-                    }
-                    
-                    y += lineHeight;
-                }
-                
-                // 添加页脚
-                doc.setPage(doc.internal.getNumberOfPages());
-                doc.setFontSize(10);
-                doc.text("© 2026 MCXGJKH 版权所有", 20, 285);
-                doc.text(`第 ${doc.internal.getNumberOfPages()} 页`, 180, 285, null, null, "right");
-                
-                // 保存文件
-                const filename = `用户协议_${new Date().getTime()}.pdf`;
-                doc.save(filename);
+                // 方法1：使用jsPDF的稳定方案
+                await generatePDFWithChineseSupport(pdfContent, filename);
                 
                 // 显示成功消息
                 showNotification('PDF生成成功！', 'success');
                 
             } catch (error) {
                 console.error('PDF生成失败:', error);
-                showNotification('生成失败，已创建文本文件', 'warning');
                 
-                // 降级到文本文件
-                generatePlainTextWithCompleteContent();
+                // 方法2：降级到文本文件
+                try {
+                    showNotification('PDF生成失败，已创建文本文件', 'warning');
+                    await generateTextFileAsFallback();
+                } catch (fallbackError) {
+                    console.error('文本文件也失败:', fallbackError);
+                    showNotification('文件生成失败，请稍后重试', 'error');
+                }
             } finally {
-                // 确保恢复按钮状态 - 添加延迟确保用户能看到状态变化
+                // 延迟恢复按钮状态，确保用户能看到变化
                 setTimeout(() => {
-                    btn.innerHTML = '<i class="fas fa-download"></i><span>下载PDF协议</span>';
+                    btn.innerHTML = originalHTML;
                     btn.disabled = false;
+                    btn.classList.remove('generating');
                 }, 1000);
             }
         }
 
-        // 获取完整内容（包括下拉框的隐藏内容）
-        function getCompleteChineseContent() {
-            let content = "用户协议与隐私政策\n\n";
-            
-            // 展开所有下拉框以获取完整内容
-            const originalStates = new Map();
-            const toggleContainers = document.querySelectorAll('.toggle-container');
-            
-            // 保存原始状态并展开所有下拉框
-            toggleContainers.forEach(container => {
-                originalStates.set(container, container.classList.contains('active'));
-                container.classList.add('active');
-            });
-            
-            // 获取所有章节
-            const sections = document.querySelectorAll('.section');
-            
-            sections.forEach((section, index) => {
-                const sectionId = section.id;
-                const title = section.querySelector('.section-title')?.textContent || '';
+        // 获取完整中文内容
+        async function getCompleteChineseContent() {
+            return new Promise((resolve) => {
+                // 展开所有下拉框获取完整内容
+                const toggleContainers = document.querySelectorAll('.toggle-container');
+                const originalStates = [];
                 
-                if (title) {
-                    content += `\n${index + 1}. ${title}\n`;
-                    content += '='.repeat(title.length + 4) + '\n\n';
-                }
-                
-                // 获取所有文本内容
-                const elements = section.querySelectorAll('p, .list-text, .card-text, .highlight-box p, .toggle-content p, td');
-                
-                elements.forEach(element => {
-                    // 排除空元素和导航元素
-                    if (element.closest('.agreement-nav') || element.closest('.agreement-header') || element.closest('.agreement-footer')) {
-                        return;
-                    }
-                    
-                    const text = element.textContent.trim();
-                    if (text && text.length > 2 && !text.match(/^[\d\s]*$/)) {
-                        // 处理不同类型的元素
-                        if (element.tagName === 'TD' && element.closest('thead')) {
-                            return; // 跳过表头
-                        }
-                        
-                        if (element.classList.contains('list-text')) {
-                            content += `  • ${text}\n`;
-                        } else if (element.closest('.highlight-box')) {
-                            content += `【重要】${text}\n`;
-                        } else if (element.closest('.card')) {
-                            content += `📌 ${text}\n`;
-                        } else if (element.closest('.toggle-content')) {
-                            content += `  ⮑ ${text}\n`;
-                        } else {
-                            content += `${text}\n`;
-                        }
+                // 记录原始状态并展开
+                toggleContainers.forEach((container, index) => {
+                    originalStates[index] = container.classList.contains('active');
+                    if (!originalStates[index]) {
+                        container.classList.add('active');
                     }
                 });
                 
-                content += '\n';
+                // 收集所有内容
+                let content = "用户协议与隐私政策\n\n";
+                content += "最后更新日期：2026年1月30日\n\n";
+                content += "=".repeat(50) + "\n\n";
+                
+                // 获取所有章节
+                const sections = document.querySelectorAll('.section');
+                
+                sections.forEach((section, index) => {
+                    const title = section.querySelector('.section-title')?.textContent || `第${index + 1}部分`;
+                    
+                    if (title) {
+                        content += `${index + 1}. ${title}\n`;
+                        content += "-".repeat(title.length + 4) + "\n\n";
+                    }
+                    
+                    // 获取该章节的所有文本
+                    const textElements = section.querySelectorAll('p, .list-text, .card-text, .highlight-box, .toggle-content, td');
+                    
+                    textElements.forEach(element => {
+                        // 跳过表头和导航
+                        if (element.closest('thead') || element.closest('.agreement-nav')) {
+                            return;
+                        }
+                        
+                        const text = element.textContent.trim();
+                        if (text && text.length > 2) {
+                            // 根据元素类型添加前缀
+                            if (element.classList.contains('list-text')) {
+                                content += `  • ${text}\n`;
+                            } else if (element.closest('.highlight-box')) {
+                                content += `【重要】${text}\n`;
+                            } else if (element.closest('.card')) {
+                                content += `📌 ${text}\n`;
+                            } else if (element.closest('.toggle-content')) {
+                                content += `  ⮑ ${text}\n`;
+                            } else if (element.tagName === 'TD') {
+                                content += `  ${text}  `;
+                            } else {
+                                content += `${text}\n`;
+                            }
+                        }
+                    });
+                    
+                    content += "\n";
+                });
+                
+                // 恢复原始状态
+                toggleContainers.forEach((container, index) => {
+                    if (!originalStates[index]) {
+                        container.classList.remove('active');
+                    }
+                });
+                
+                // 添加页脚信息
+                content += "\n" + "=".repeat(50) + "\n";
+                content += "文档信息\n";
+                content += "=".repeat(50) + "\n";
+                content += `生成时间：${new Date().toLocaleString('zh-CN')}\n`;
+                content += `版权所有 © 2026 MCXGJKH\n`;
+                
+                resolve(content);
             });
-            
-            // 恢复下拉框的原始状态
-            toggleContainers.forEach(container => {
-                const wasActive = originalStates.get(container);
-                if (!wasActive) {
-                    container.classList.remove('active');
-                }
-            });
-            
-            // 添加基本信息
-            content += '\n\n' + '-'.repeat(40) + '\n';
-            content += '文档信息\n';
-            content += '-'.repeat(40) + '\n';
-            content += `生成时间：${new Date().toLocaleString('zh-CN')}\n`;
-            content += `最后更新：2026年1月30日\n`;
-            content += '© 2026 MCXGJKH 版权所有\n';
-            
-            return content;
         }
 
-        // 文本文件生成（包含完整内容）
-        function generatePlainTextWithCompleteContent() {
-            const text = getCompleteChineseContent();
-            const blob = new Blob(['\uFEFF' + text], { 
-                type: 'text/plain;charset=utf-8;charset=UTF-8' 
+        // 生成支持中文的PDF
+        async function generatePDFWithChineseSupport(content, filename) {
+            return new Promise((resolve, reject) => {
+                try {
+                    // 使用jsPDF
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF();
+                    
+                    // 使用内置字体（支持基本字符）
+                    doc.setFont("helvetica");
+                    doc.setFontSize(16);
+                    
+                    // 标题
+                    doc.text("用户协议与隐私政策", 105, 20, { align: "center" });
+                    
+                    // 基本信息
+                    doc.setFontSize(10);
+                    doc.text(`生成时间：${new Date().toLocaleDateString('zh-CN')}`, 20, 30);
+                    
+                    // 设置正文
+                    doc.setFontSize(11);
+                    
+                    // 分割文本为行
+                    const lines = content.split('\n');
+                    let y = 40;
+                    const lineHeight = 6;
+                    
+                    for (let i = 0; i < lines.length; i++) {
+                        if (y > 280) {
+                            doc.addPage();
+                            y = 20;
+                        }
+                        
+                        const line = lines[i];
+                        if (line.trim()) {
+                            // 处理不同的内容类型
+                            if (line.match(/^[一二三四五六]|^\d+\./)) {
+                                doc.setFont("helvetica", "bold");
+                                doc.text(line, 20, y);
+                                doc.setFont("helvetica", "normal");
+                            } else if (line.includes('【重要】')) {
+                                doc.setFont("helvetica", "bold");
+                                doc.text(line.replace('【重要】', '⚠️ '), 20, y);
+                                doc.setFont("helvetica", "normal");
+                            } else {
+                                doc.text(line, 20, y);
+                            }
+                            
+                            y += lineHeight;
+                        } else {
+                            y += lineHeight * 0.5; // 空行间距小一些
+                        }
+                    }
+                    
+                    // 保存PDF - 只调用一次
+                    doc.save(filename);
+                    
+                    // 等待一小段时间确保保存完成
+                    setTimeout(resolve, 500);
+                    
+                } catch (error) {
+                    reject(error);
+                }
             });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `用户协议_${new Date().getTime()}.txt`;
-            link.style.display = 'none';
-            
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            setTimeout(() => URL.revokeObjectURL(link.href), 100);
+        }
+
+        // 生成文本文件作为后备
+        async function generateTextFileAsFallback() {
+            return new Promise((resolve, reject) => {
+                try {
+                    // 获取内容
+                    const content = getCompleteChineseContent();
+                    
+                    // 创建文本文件
+                    const blob = new Blob([content], { 
+                        type: 'text/plain;charset=utf-8' 
+                    });
+                    
+                    const filename = `用户协议_${new Date().getTime()}.txt`;
+                    const url = URL.createObjectURL(blob);
+                    
+                    // 创建下载链接
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = filename;
+                    link.style.display = 'none';
+                    
+                    document.body.appendChild(link);
+                    
+                    // 只触发一次点击
+                    link.click();
+                    
+                    // 清理
+                    setTimeout(() => {
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url);
+                        resolve();
+                    }, 100);
+                    
+                } catch (error) {
+                    reject(error);
+                }
+            });
         }
 
         // 显示通知
         function showNotification(message, type = 'info') {
             // 移除现有通知
-            const existingNotifications = document.querySelectorAll('.custom-notification');
-            existingNotifications.forEach(note => {
-                note.style.animation = 'slideOutRight 0.5s ease';
-                setTimeout(() => note.remove(), 500);
-            });
+            const existing = document.querySelectorAll('.pdf-notification');
+            existing.forEach(el => el.remove());
             
-            // 延迟一点显示新通知
+            const colors = {
+                success: 'linear-gradient(135deg, var(--success-color), #2d8c00)',
+                error: 'linear-gradient(135deg, var(--danger-color), #c53030)',
+                info: 'linear-gradient(135deg, var(--primary-color), var(--secondary-color))',
+                warning: 'linear-gradient(135deg, var(--warning-color), #d97706)'
+            };
+            
+            const icons = {
+                success: 'fas fa-check-circle',
+                error: 'fas fa-exclamation-circle',
+                info: 'fas fa-info-circle',
+                warning: 'fas fa-exclamation-triangle'
+            };
+            
+            const notification = document.createElement('div');
+            notification.className = 'pdf-notification';
+            notification.innerHTML = `<i class="${icons[type]}"></i> ${message}`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${colors[type]};
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                box-shadow: var(--shadow-md);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                animation: slideIn 0.3s ease;
+                font-size: 14px;
+                max-width: 300px;
+            `;
+            
+            document.body.appendChild(notification);
+            
             setTimeout(() => {
-                const colors = {
-                    success: 'linear-gradient(135deg, var(--success-color), #2d8c00)',
-                    error: 'linear-gradient(135deg, var(--danger-color), #c53030)',
-                    info: 'linear-gradient(135deg, var(--primary-color), var(--secondary-color))',
-                    warning: 'linear-gradient(135deg, var(--warning-color), #d97706)'
-                };
-                
-                const icons = {
-                    success: 'fas fa-check-circle',
-                    error: 'fas fa-exclamation-circle',
-                    info: 'fas fa-info-circle',
-                    warning: 'fas fa-exclamation-triangle'
-                };
-                
-                const notification = document.createElement('div');
-                notification.className = 'custom-notification';
-                notification.innerHTML = `<i class="${icons[type]}"></i> ${message}`;
-                notification.style.cssText = `
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    background: ${colors[type]};
-                    color: white;
-                    padding: 15px 25px;
-                    border-radius: 10px;
-                    box-shadow: var(--shadow-lg);
-                    z-index: 10000;
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-                    animation: slideInRight 0.5s ease;
-                    max-width: 400px;
-                    word-wrap: break-word;
-                `;
-                
-                document.body.appendChild(notification);
-                
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.style.animation = 'slideOutRight 0.5s ease';
-                        setTimeout(() => {
-                            if (notification.parentNode) {
-                                notification.remove();
-                            }
-                        }, 500);
-                    }
-                }, 3000);
-            }, 100);
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
         }
 
-        // 统一按钮样式
-        function initButtonStyles() {
+        // 初始化按钮样式和事件
+        function initPDFButton() {
+            // 添加必要的CSS
             const style = document.createElement('style');
             style.textContent = `
-                /* 统一所有按钮样式 */
-                .action-btn, .simple-cn-btn {
-                    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-                    color: white;
-                    border: none;
-                    padding: 16px 35px;
-                    border-radius: var(--radius-md);
-                    font-size: 16px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    transition: var(--transition);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 10px;
-                    min-width: 180px;
-                }
-                
-                .action-btn:hover:not(:disabled), .simple-cn-btn:hover:not(:disabled) {
-                    transform: translateY(-3px);
-                    box-shadow: var(--shadow-md);
-                    background: linear-gradient(135deg, var(--primary-dark), #6200b3);
-                }
-                
-                .action-btn:disabled, .simple-cn-btn:disabled {
-                    opacity: 0.7;
-                    cursor: not-allowed;
-                    transform: none !important;
-                }
-                
-                /* 生成中状态 */
-                .simple-cn-btn.generating {
-                    background: linear-gradient(135deg, var(--warning-color), #d97706);
-                }
-                
-                /* 接受按钮特殊状态 */
-                #acceptBtn.accepted {
-                    background: linear-gradient(135deg, var(--success-color), #2d8c00);
-                }
-                
-                /* 下载按钮始终显示图标 */
-                .simple-cn-btn i {
-                    display: inline-block !important;
-                    font-size: 18px;
-                    opacity: 1 !important;
-                }
-                
-                /* 移除固定按钮样式（如果存在） */
-                .cn-pdf-btn {
-                    display: none;
-                }
-                
-                /* 动画 */
-                @keyframes slideInRight {
+                @keyframes slideIn {
                     from { transform: translateX(100%); opacity: 0; }
                     to { transform: translateX(0); opacity: 1; }
                 }
-                
-                @keyframes slideOutRight {
+                @keyframes slideOut {
                     from { transform: translateX(0); opacity: 1; }
                     to { transform: translateX(100%); opacity: 0; }
                 }
                 
-                /* 移动端适配 */
-                @media (max-width: 768px) {
-                    .action-btn, .simple-cn-btn {
-                        padding: 14px 25px;
-                        font-size: 15px;
-                        min-width: 160px;
-                    }
+                .simple-cn-btn.generating {
+                    background: linear-gradient(135deg, var(--warning-color), #d97706) !important;
                 }
                 
-                @media (max-width: 480px) {
-                    .action-btn, .simple-cn-btn {
-                        width: 100%;
-                        padding: 12px 20px;
-                        font-size: 14px;
-                    }
-                    
-                    .footer-actions {
-                        flex-direction: column;
-                        gap: 15px;
-                    }
+                .simple-cn-btn i {
+                    display: inline-block !important;
                 }
             `;
             document.head.appendChild(style);
-        }
-
-        // 确保下载按钮图标可见
-        function ensureButtonIconVisible() {
+            
+            // 获取下载按钮
             const downloadBtn = document.querySelector('.simple-cn-btn');
+            
             if (downloadBtn) {
-                // 确保图标存在
+                // 确保按钮有正确的结构
                 if (!downloadBtn.querySelector('i')) {
                     downloadBtn.innerHTML = '<i class="fas fa-download"></i><span>下载PDF协议</span>';
                 }
                 
-                // 确保图标可见
-                const icon = downloadBtn.querySelector('i');
-                if (icon) {
-                    icon.style.display = 'inline-block';
-                    icon.style.opacity = '1';
-                }
+                // 移除所有现有的事件监听器（通过克隆节点）
+                const newBtn = downloadBtn.cloneNode(true);
+                downloadBtn.parentNode.replaceChild(newBtn, downloadBtn);
+                
+                // 添加单个事件监听器
+                newBtn.addEventListener('click', function(e) {
+                    generateChinesePDF2(e);
+                }, { once: false }); // 注意：我们允许重复点击，但按钮状态会防止重复执行
+                
+                console.log('PDF按钮初始化完成');
             }
         }
 
         // 初始化页面
         document.addEventListener('DOMContentLoaded', function() {
-            // 初始化按钮样式
-            initButtonStyles();
+            // 初始化PDF按钮
+            initPDFButton();
             
-            // 确保按钮图标可见
-            ensureButtonIconVisible();
-            
-            // 获取元素
+            // 获取其他元素
             const navLinks = document.querySelectorAll('.nav-link');
             const toggleHeaders = document.querySelectorAll('.toggle-header');
             const acceptBtn = document.getElementById('acceptBtn');
-            const downloadBtn = document.querySelector('.simple-cn-btn');
             
             // 导航链接点击效果
             navLinks.forEach(link => {
@@ -1580,23 +1555,6 @@
                 });
             }
             
-            // PDF下载按钮点击事件
-            if (downloadBtn) {
-                // 移除可能存在的旧监听器
-                downloadBtn.replaceWith(downloadBtn.cloneNode(true));
-                const newDownloadBtn = document.querySelector('.simple-cn-btn');
-                
-                newDownloadBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    generateChinesePDF2(e);
-                });
-                
-                // 确保按钮有正确的HTML结构
-                if (!newDownloadBtn.querySelector('i')) {
-                    newDownloadBtn.innerHTML = '<i class="fas fa-download"></i><span>下载PDF协议</span>';
-                }
-            }
-            
             // 滚动时更新导航状态
             const sections = document.querySelectorAll('.section');
             const observer = new IntersectionObserver(function(entries) {
@@ -1618,27 +1576,12 @@
             });
             
             sections.forEach(section => observer.observe(section));
-            
-            // 移除任何可能存在的固定按钮
-            const fixedButtons = document.querySelectorAll('.cn-pdf-btn');
-            fixedButtons.forEach(btn => btn.remove());
         });
 
-        // 页面加载完成后确保按钮状态正确
+        // 页面加载完成后重新初始化按钮
         window.addEventListener('load', function() {
-            ensureButtonIconVisible();
-            
-            // 再次检查并绑定下载按钮
-            setTimeout(() => {
-                const downloadBtn = document.querySelector('.simple-cn-btn');
-                if (downloadBtn && !downloadBtn.hasAttribute('data-bound')) {
-                    downloadBtn.setAttribute('data-bound', 'true');
-                    downloadBtn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        generateChinesePDF2(e);
-                    });
-                }
-            }, 500);
+            // 确保按钮正确初始化
+            setTimeout(initPDFButton, 100);
         });
     </script>
 </body>
