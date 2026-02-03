@@ -1148,112 +1148,184 @@
     <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
     <script>
-        // 极简中文PDF生成方案 - 修复按钮状态问题
+        // PDF生成方案
         async function generateChinesePDF2(event) {
-            const btn = event.target;
+            const btn = event.currentTarget;
             
             // 保存原始状态
             const originalHTML = btn.innerHTML;
-            const originalClass = btn.className;
             
-            // 更新按钮状态
+            // 显示生成中状态
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>生成中...</span>';
-            btn.className = 'simple-cn-btn generating';
             btn.disabled = true;
             
             try {
-                // 使用更简单的PDF生成方案
-                const pdfContent = getChineseContent();
+                // 获取完整内容（包括下拉框内容）
+                const pdfContent = getCompleteChineseContent();
                 
-                // 使用jsPDF
+                // 创建PDF
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
                 
-                // 设置字体
+                // 设置中文字体（使用内置字体避免乱码）
                 doc.setFont("helvetica");
                 doc.setFontSize(16);
                 
-                // 添加标题
+                // 标题
                 doc.text("用户协议与隐私政策", 20, 20);
+                
+                // 元信息
+                doc.setFontSize(10);
+                doc.text(`生成时间：${new Date().toLocaleDateString('zh-CN')}`, 20, 30);
+                doc.text(`最后更新：2026年1月30日`, 20, 36);
+                
+                // 开始添加内容
                 doc.setFontSize(12);
+                let y = 50;
+                const lineHeight = 7;
+                const pageWidth = 170;
                 
-                // 分割文本以适应PDF宽度
-                const splitText = doc.splitTextToSize(pdfContent, 170);
+                // 分割并添加内容
+                const lines = doc.splitTextToSize(pdfContent, pageWidth);
                 
-                // 添加内容
-                let y = 30;
-                for (let i = 0; i < splitText.length; i++) {
+                for (let i = 0; i < lines.length; i++) {
                     if (y > 280) {
                         doc.addPage();
                         y = 20;
                     }
-                    doc.text(splitText[i], 20, y);
-                    y += 7;
+                    
+                    // 检查是否是标题行
+                    if (lines[i].match(/^[一二三四五六]、|^[0-9]+\./)) {
+                        doc.setFont("helvetica", "bold");
+                        doc.text(lines[i], 20, y);
+                        doc.setFont("helvetica", "normal");
+                    } else if (lines[i].match(/^[A-Z].+：$/)) {
+                        doc.setFont("helvetica", "bold");
+                        doc.text(lines[i], 20, y);
+                        doc.setFont("helvetica", "normal");
+                    } else {
+                        doc.text(lines[i], 20, y);
+                    }
+                    
+                    y += lineHeight;
                 }
                 
                 // 添加页脚
+                doc.setPage(doc.internal.getNumberOfPages());
                 doc.setFontSize(10);
-                doc.text(`生成时间：${new Date().toLocaleDateString('zh-CN')}`, 20, 285);
+                doc.text("© 2026 MCXGJKH 版权所有", 20, 285);
+                doc.text(`第 ${doc.internal.getNumberOfPages()} 页`, 180, 285, null, null, "right");
                 
-                // 保存PDF
-                doc.save('用户协议与隐私政策.pdf');
+                // 保存文件
+                const filename = `用户协议_${new Date().getTime()}.pdf`;
+                doc.save(filename);
                 
                 // 显示成功消息
                 showNotification('PDF生成成功！', 'success');
                 
             } catch (error) {
                 console.error('PDF生成失败:', error);
-                showNotification('PDF生成失败，已生成文本文件', 'warning');
+                showNotification('生成失败，已创建文本文件', 'warning');
                 
                 // 降级到文本文件
-                generatePlainText();
+                generatePlainTextWithCompleteContent();
             } finally {
-                // 确保按钮状态恢复
+                // 确保恢复按钮状态 - 添加延迟确保用户能看到状态变化
                 setTimeout(() => {
                     btn.innerHTML = '<i class="fas fa-download"></i><span>下载PDF协议</span>';
-                    btn.className = originalClass;
                     btn.disabled = false;
-                }, 500); // 给一点延迟确保状态更新
+                }, 1000);
             }
         }
 
-        function getChineseContent() {
-            // 获取所有章节内容
+        // 获取完整内容（包括下拉框的隐藏内容）
+        function getCompleteChineseContent() {
+            let content = "用户协议与隐私政策\n\n";
+            
+            // 展开所有下拉框以获取完整内容
+            const originalStates = new Map();
+            const toggleContainers = document.querySelectorAll('.toggle-container');
+            
+            // 保存原始状态并展开所有下拉框
+            toggleContainers.forEach(container => {
+                originalStates.set(container, container.classList.contains('active'));
+                container.classList.add('active');
+            });
+            
+            // 获取所有章节
             const sections = document.querySelectorAll('.section');
-            let content = '用户协议与隐私政策\n\n';
             
             sections.forEach((section, index) => {
-                const title = section.querySelector('.section-title')?.textContent || `第${index + 1}部分`;
-                const texts = section.querySelectorAll('p, .list-text, .card-text, .toggle-content');
+                const sectionId = section.id;
+                const title = section.querySelector('.section-title')?.textContent || '';
                 
-                content += `\n${title}\n`;
-                content += '='.repeat(title.length * 2) + '\n\n';
+                if (title) {
+                    content += `\n${index + 1}. ${title}\n`;
+                    content += '='.repeat(title.length + 4) + '\n\n';
+                }
                 
-                texts.forEach(text => {
-                    const textContent = text.textContent.trim();
-                    if (textContent && textContent.length > 10) {
-                        content += textContent + '\n\n';
+                // 获取所有文本内容
+                const elements = section.querySelectorAll('p, .list-text, .card-text, .highlight-box p, .toggle-content p, td');
+                
+                elements.forEach(element => {
+                    // 排除空元素和导航元素
+                    if (element.closest('.agreement-nav') || element.closest('.agreement-header') || element.closest('.agreement-footer')) {
+                        return;
+                    }
+                    
+                    const text = element.textContent.trim();
+                    if (text && text.length > 2 && !text.match(/^[\d\s]*$/)) {
+                        // 处理不同类型的元素
+                        if (element.tagName === 'TD' && element.closest('thead')) {
+                            return; // 跳过表头
+                        }
+                        
+                        if (element.classList.contains('list-text')) {
+                            content += `  • ${text}\n`;
+                        } else if (element.closest('.highlight-box')) {
+                            content += `【重要】${text}\n`;
+                        } else if (element.closest('.card')) {
+                            content += `📌 ${text}\n`;
+                        } else if (element.closest('.toggle-content')) {
+                            content += `  ⮑ ${text}\n`;
+                        } else {
+                            content += `${text}\n`;
+                        }
                     }
                 });
+                
+                content += '\n';
+            });
+            
+            // 恢复下拉框的原始状态
+            toggleContainers.forEach(container => {
+                const wasActive = originalStates.get(container);
+                if (!wasActive) {
+                    container.classList.remove('active');
+                }
             });
             
             // 添加基本信息
-            content += '\n\n' + '-'.repeat(50) + '\n';
-            content += '文档信息：\n';
+            content += '\n\n' + '-'.repeat(40) + '\n';
+            content += '文档信息\n';
+            content += '-'.repeat(40) + '\n';
             content += `生成时间：${new Date().toLocaleString('zh-CN')}\n`;
-            content += '版权所有 © 2026 MCXGJKH\n';
+            content += `最后更新：2026年1月30日\n`;
+            content += '© 2026 MCXGJKH 版权所有\n';
             
             return content;
         }
 
-        function generatePlainText() {
-            const text = getChineseContent();
+        // 文本文件生成（包含完整内容）
+        function generatePlainTextWithCompleteContent() {
+            const text = getCompleteChineseContent();
             const blob = new Blob(['\uFEFF' + text], { 
-                type: 'text/plain;charset=utf-8' 
+                type: 'text/plain;charset=utf-8;charset=UTF-8' 
             });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
             link.download = `用户协议_${new Date().getTime()}.txt`;
+            link.style.display = 'none';
             
             document.body.appendChild(link);
             link.click();
@@ -1265,56 +1337,69 @@
         // 显示通知
         function showNotification(message, type = 'info') {
             // 移除现有通知
-            const existingNotifications = document.querySelectorAll('.notification');
-            existingNotifications.forEach(note => note.remove());
+            const existingNotifications = document.querySelectorAll('.custom-notification');
+            existingNotifications.forEach(note => {
+                note.style.animation = 'slideOutRight 0.5s ease';
+                setTimeout(() => note.remove(), 500);
+            });
             
-            const colors = {
-                success: 'linear-gradient(135deg, var(--success-color), #2d8c00)',
-                error: 'linear-gradient(135deg, var(--danger-color), #c53030)',
-                info: 'linear-gradient(135deg, var(--primary-color), var(--secondary-color))',
-                warning: 'linear-gradient(135deg, var(--warning-color), #d97706)'
-            };
-            
-            const icons = {
-                success: 'fas fa-check-circle',
-                error: 'fas fa-exclamation-circle',
-                info: 'fas fa-info-circle',
-                warning: 'fas fa-exclamation-triangle'
-            };
-            
-            const notification = document.createElement('div');
-            notification.className = 'notification';
-            notification.innerHTML = `<i class="${icons[type]}"></i> ${message}`;
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: ${colors[type]};
-                color: white;
-                padding: 15px 25px;
-                border-radius: 10px;
-                box-shadow: var(--shadow-lg);
-                z-index: 10000;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                animation: slideInRight 0.5s ease;
-                max-width: 400px;
-            `;
-            
-            document.body.appendChild(notification);
-            
+            // 延迟一点显示新通知
             setTimeout(() => {
-                notification.style.animation = 'slideOutRight 0.5s ease';
-                setTimeout(() => notification.remove(), 500);
-            }, 3000);
+                const colors = {
+                    success: 'linear-gradient(135deg, var(--success-color), #2d8c00)',
+                    error: 'linear-gradient(135deg, var(--danger-color), #c53030)',
+                    info: 'linear-gradient(135deg, var(--primary-color), var(--secondary-color))',
+                    warning: 'linear-gradient(135deg, var(--warning-color), #d97706)'
+                };
+                
+                const icons = {
+                    success: 'fas fa-check-circle',
+                    error: 'fas fa-exclamation-circle',
+                    info: 'fas fa-info-circle',
+                    warning: 'fas fa-exclamation-triangle'
+                };
+                
+                const notification = document.createElement('div');
+                notification.className = 'custom-notification';
+                notification.innerHTML = `<i class="${icons[type]}"></i> ${message}`;
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: ${colors[type]};
+                    color: white;
+                    padding: 15px 25px;
+                    border-radius: 10px;
+                    box-shadow: var(--shadow-lg);
+                    z-index: 10000;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    animation: slideInRight 0.5s ease;
+                    max-width: 400px;
+                    word-wrap: break-word;
+                `;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.style.animation = 'slideOutRight 0.5s ease';
+                        setTimeout(() => {
+                            if (notification.parentNode) {
+                                notification.remove();
+                            }
+                        }, 500);
+                    }
+                }, 3000);
+            }, 100);
         }
 
-        // 统一所有按钮的CSS样式
-        function addButtonStyles() {
+        // 统一按钮样式
+        function initButtonStyles() {
             const style = document.createElement('style');
             style.textContent = `
-                /* 统一按钮样式 */
+                /* 统一所有按钮样式 */
                 .action-btn, .simple-cn-btn {
                     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
                     color: white;
@@ -1332,43 +1417,38 @@
                     min-width: 180px;
                 }
                 
-                .action-btn:hover, .simple-cn-btn:hover {
+                .action-btn:hover:not(:disabled), .simple-cn-btn:hover:not(:disabled) {
                     transform: translateY(-3px);
                     box-shadow: var(--shadow-md);
                     background: linear-gradient(135deg, var(--primary-dark), #6200b3);
                 }
                 
-                .action-btn:active, .simple-cn-btn:active {
-                    transform: translateY(-1px);
-                }
-                
                 .action-btn:disabled, .simple-cn-btn:disabled {
-                    opacity: 0.6;
+                    opacity: 0.7;
                     cursor: not-allowed;
                     transform: none !important;
                 }
                 
+                /* 生成中状态 */
                 .simple-cn-btn.generating {
                     background: linear-gradient(135deg, var(--warning-color), #d97706);
                 }
                 
-                /* 接受按钮的特殊状态 */
+                /* 接受按钮特殊状态 */
                 #acceptBtn.accepted {
                     background: linear-gradient(135deg, var(--success-color), #2d8c00);
                 }
                 
-                /* 按钮图标 */
-                .action-btn i, .simple-cn-btn i {
+                /* 下载按钮始终显示图标 */
+                .simple-cn-btn i {
+                    display: inline-block !important;
                     font-size: 18px;
+                    opacity: 1 !important;
                 }
                 
-                /* 固定定位的PDF按钮 */
+                /* 移除固定按钮样式（如果存在） */
                 .cn-pdf-btn {
-                    position: fixed;
-                    bottom: 20px;
-                    right: 20px;
-                    z-index: 1000;
-                    box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+                    display: none;
                 }
                 
                 /* 动画 */
@@ -1382,24 +1462,12 @@
                     to { transform: translateX(100%); opacity: 0; }
                 }
                 
-                /* 移动端按钮调整 */
+                /* 移动端适配 */
                 @media (max-width: 768px) {
                     .action-btn, .simple-cn-btn {
                         padding: 14px 25px;
                         font-size: 15px;
                         min-width: 160px;
-                    }
-                    
-                    .footer-actions {
-                        flex-direction: column;
-                        gap: 15px;
-                    }
-                    
-                    .cn-pdf-btn {
-                        bottom: 80px; /* 避免被移动端底部导航栏遮挡 */
-                        right: 15px;
-                        padding: 12px 20px;
-                        font-size: 14px;
                     }
                 }
                 
@@ -1410,53 +1478,46 @@
                         font-size: 14px;
                     }
                     
-                    .cn-pdf-btn {
-                        bottom: 70px;
-                        right: 10px;
-                        padding: 10px 16px;
-                        font-size: 13px;
+                    .footer-actions {
+                        flex-direction: column;
+                        gap: 15px;
                     }
                 }
             `;
             document.head.appendChild(style);
         }
 
-        // 初始化移动端导航
-        function initMobileNavigation() {
-            const navTitle = document.querySelector('.nav-title');
-            const agreementNav = document.querySelector('.agreement-nav');
-            const navLinks = document.querySelectorAll('.nav-link');
-            
-            if (window.innerWidth <= 480 && navTitle && agreementNav) {
-                // 添加移动端导航交互
-                navTitle.style.cursor = 'pointer';
+        // 确保下载按钮图标可见
+        function ensureButtonIconVisible() {
+            const downloadBtn = document.querySelector('.simple-cn-btn');
+            if (downloadBtn) {
+                // 确保图标存在
+                if (!downloadBtn.querySelector('i')) {
+                    downloadBtn.innerHTML = '<i class="fas fa-download"></i><span>下载PDF协议</span>';
+                }
                 
-                navTitle.addEventListener('click', function() {
-                    agreementNav.classList.toggle('expanded');
-                });
-                
-                navLinks.forEach(link => {
-                    link.addEventListener('click', function() {
-                        setTimeout(() => {
-                            agreementNav.classList.remove('expanded');
-                        }, 300);
-                    });
-                });
+                // 确保图标可见
+                const icon = downloadBtn.querySelector('i');
+                if (icon) {
+                    icon.style.display = 'inline-block';
+                    icon.style.opacity = '1';
+                }
             }
         }
 
         // 初始化页面
         document.addEventListener('DOMContentLoaded', function() {
-            // 添加按钮样式
-            addButtonStyles();
+            // 初始化按钮样式
+            initButtonStyles();
             
-            // 初始化移动端导航
-            initMobileNavigation();
+            // 确保按钮图标可见
+            ensureButtonIconVisible();
             
             // 获取元素
             const navLinks = document.querySelectorAll('.nav-link');
             const toggleHeaders = document.querySelectorAll('.toggle-header');
             const acceptBtn = document.getElementById('acceptBtn');
+            const downloadBtn = document.querySelector('.simple-cn-btn');
             
             // 导航链接点击效果
             navLinks.forEach(link => {
@@ -1488,11 +1549,9 @@
                     // 更新图标
                     const icon = this.querySelector('.toggle-icon i');
                     if (icon) {
-                        if (container.classList.contains('active')) {
-                            icon.className = 'fas fa-chevron-up';
-                        } else {
-                            icon.className = 'fas fa-chevron-down';
-                        }
+                        icon.className = container.classList.contains('active') 
+                            ? 'fas fa-chevron-up' 
+                            : 'fas fa-chevron-down';
                     }
                 });
             });
@@ -1503,7 +1562,6 @@
                     if (this.classList.contains('accepted')) return;
                     
                     const originalHTML = this.innerHTML;
-                    const originalDisabled = this.disabled;
                     
                     // 更新按钮状态
                     this.innerHTML = '<i class="fas fa-check-circle"></i><span>条款已接受</span>';
@@ -1513,32 +1571,34 @@
                     // 显示成功提示
                     showNotification('您已成功接受用户协议与隐私政策', 'success');
                     
-                    // 5秒后恢复按钮状态（可选）
+                    // 可选：5秒后恢复按钮
                     setTimeout(() => {
                         this.innerHTML = originalHTML;
                         this.classList.remove('accepted');
-                        this.disabled = originalDisabled;
+                        this.disabled = false;
                     }, 5000);
                 });
             }
             
-            // 为PDF按钮添加事件监听
-            setTimeout(() => {
-                const pdfBtn = document.querySelector('.simple-cn-btn');
-                if (pdfBtn && !pdfBtn.hasAttribute('data-listener')) {
-                    pdfBtn.setAttribute('data-listener', 'true');
-                    pdfBtn.addEventListener('click', generateChinesePDF2);
+            // PDF下载按钮点击事件
+            if (downloadBtn) {
+                // 移除可能存在的旧监听器
+                downloadBtn.replaceWith(downloadBtn.cloneNode(true));
+                const newDownloadBtn = document.querySelector('.simple-cn-btn');
+                
+                newDownloadBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    generateChinesePDF2(e);
+                });
+                
+                // 确保按钮有正确的HTML结构
+                if (!newDownloadBtn.querySelector('i')) {
+                    newDownloadBtn.innerHTML = '<i class="fas fa-download"></i><span>下载PDF协议</span>';
                 }
-            }, 100);
+            }
             
             // 滚动时更新导航状态
             const sections = document.querySelectorAll('.section');
-            const observerOptions = {
-                root: null,
-                rootMargin: window.innerWidth <= 768 ? '-10% 0px -80% 0px' : '-20% 0px -70% 0px',
-                threshold: 0
-            };
-            
             const observer = new IntersectionObserver(function(entries) {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -1551,31 +1611,35 @@
                         });
                     }
                 });
-            }, observerOptions);
+            }, {
+                root: null,
+                rootMargin: window.innerWidth <= 768 ? '-10% 0px -80% 0px' : '-20% 0px -70% 0px',
+                threshold: 0
+            });
             
             sections.forEach(section => observer.observe(section));
             
-            // 窗口大小改变时重新初始化
-            let resizeTimer;
-            window.addEventListener('resize', function() {
-                clearTimeout(resizeTimer);
-                resizeTimer = setTimeout(initMobileNavigation, 250);
-            });
+            // 移除任何可能存在的固定按钮
+            const fixedButtons = document.querySelectorAll('.cn-pdf-btn');
+            fixedButtons.forEach(btn => btn.remove());
         });
 
-        // 添加固定PDF按钮
-        function addFixedPdfButton() {
-            if (!document.querySelector('.cn-pdf-btn')) {
-                const fixedBtn = document.createElement('button');
-                fixedBtn.className = 'cn-pdf-btn action-btn';
-                fixedBtn.innerHTML = '<i class="fas fa-download"></i><span>下载PDF</span>';
-                fixedBtn.addEventListener('click', generateChinesePDF2);
-                document.body.appendChild(fixedBtn);
-            }
-        }
-
-        // 页面加载完成后添加固定按钮
-        window.addEventListener('load', addFixedPdfButton);
+        // 页面加载完成后确保按钮状态正确
+        window.addEventListener('load', function() {
+            ensureButtonIconVisible();
+            
+            // 再次检查并绑定下载按钮
+            setTimeout(() => {
+                const downloadBtn = document.querySelector('.simple-cn-btn');
+                if (downloadBtn && !downloadBtn.hasAttribute('data-bound')) {
+                    downloadBtn.setAttribute('data-bound', 'true');
+                    downloadBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        generateChinesePDF2(e);
+                    });
+                }
+            }, 500);
+        });
     </script>
 </body>
 </html>
