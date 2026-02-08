@@ -100,7 +100,7 @@
 			height: 100%;
 			pointer-events: none;
 			z-index: 999997;
-			opacity: 0.05;
+			opacity: 0.1;
 		}
 		
 		.protection-mixed-layer {
@@ -115,8 +115,8 @@
 				45deg,
 				transparent,
 				transparent 10px,
-				rgba(0,0,0,0.015) 10px,
-				rgba(0,0,0,0.015) 20px
+				rgba(0,0,0,0.02) 10px,
+				rgba(0,0,0,0.02) 20px
 			);
 			mix-blend-mode: multiply;
 			animation: subtleShift 60s infinite linear;
@@ -131,7 +131,7 @@
 			transition: transform 0.5s ease, filter 0.5s ease;
 		}
 		
-		/* 增强水印效果 */
+		/* 增强水印效果 - 更可见 */
 		.protection-watermark-overlay {
 			position: fixed;
 			top: 0;
@@ -144,14 +144,29 @@
 				45deg,
 				transparent,
 				transparent 20px,
-				rgba(255,255,255,0.02) 20px,
-				rgba(255,255,255,0.02) 40px
+				rgba(255,255,255,0.03) 20px,
+				rgba(255,255,255,0.03) 40px
 			);
 		}
 		
-		/* 内容模糊保护 */
-		.content-blur-protection {
-			filter: blur(0.3px);
+		/* 固定水印层 - 更明显 */
+		.fixed-watermarks {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			pointer-events: none;
+			z-index: 999994;
+			font-family: Arial, sans-serif;
+		}
+		
+		.fixed-watermark {
+			position: absolute;
+			font-size: 24px;
+			color: rgba(0,0,0,0.2);
+			transform: rotate(-45deg);
+			white-space: nowrap;
 		}
 		
 		/* 像素级干扰 */
@@ -162,10 +177,10 @@
 			width: 100%;
 			height: 100%;
 			pointer-events: none;
-			z-index: 999994;
+			z-index: 999993;
 			background-image: 
-				radial-gradient(circle at 25% 25%, rgba(0,0,0,0.01) 1px, transparent 1px),
-				radial-gradient(circle at 75% 75%, rgba(0,0,0,0.01) 1px, transparent 1px);
+				radial-gradient(circle at 25% 25%, rgba(0,0,0,0.02) 1px, transparent 1px),
+				radial-gradient(circle at 75% 75%, rgba(0,0,0,0.02) 1px, transparent 1px);
 			background-size: 50px 50px, 50px 50px;
 		}
 	</style>
@@ -784,487 +799,329 @@
 	</body>
 
 	<script>
-        // 用户协议管理（只在首页执行）
+		// =========== 简化防截图系统 ===========
+		let screenshotProtectionActive = false;
 		
-
-		// 非首页：直接显示内容并启动防护
-		document.addEventListener('DOMContentLoaded', function() {
-			if (typeof initializePageProtection === 'function') {
-				initializePageProtection();
-			} else if (window.initializePageProtection && typeof window.initializePageProtection === 'function') {
-				window.initializePageProtection();
-			}
+		// 初始化防截图系统
+		function initializeScreenshotProtection() {
+			console.log('防截图系统启动中...');
 			
-			initializeComprehensiveProtection();
-		});
-		
-
-		// =========== 综合防护系统 ===========
-		let comprehensiveProtection = null;
-		
-		function initializeComprehensiveProtection() {
-			if (isWithinProtectionWindow()) {
+			// 检查是否在密码验证有效期内
+			const expiry = localStorage.getItem('protection_expiry');
+			if (expiry && Date.now() < parseInt(expiry)) {
+				console.log('在密码验证有效期内，跳过防截图系统');
 				return;
 			}
 			
-			comprehensiveProtection = new ComprehensiveProtection();
-			comprehensiveProtection.start();
+			// 启动防截图系统
+			startScreenshotProtection();
+			screenshotProtectionActive = true;
 			
+			// 监听存储变化，当防护过期时重新启动
 			window.addEventListener('storage', function(e) {
 				if (e.key === 'protection_expiry') {
 					setTimeout(() => {
-						if (!isWithinProtectionWindow()) {
-							if (!comprehensiveProtection || !comprehensiveProtection.isActive) {
-								comprehensiveProtection = new ComprehensiveProtection();
-								comprehensiveProtection.start();
+						const expiry = localStorage.getItem('protection_expiry');
+						if (!expiry || Date.now() >= parseInt(expiry)) {
+							if (!screenshotProtectionActive) {
+								startScreenshotProtection();
+								screenshotProtectionActive = true;
 							}
 						} else {
-							if (comprehensiveProtection && comprehensiveProtection.isActive) {
-								comprehensiveProtection.stop();
-							}
+							stopScreenshotProtection();
+							screenshotProtectionActive = false;
 						}
 					}, 100);
 				}
 			});
+			
+			console.log('防截图系统已启动');
 		}
 		
-		class ComprehensiveProtection {
-			constructor() {
-				this.isActive = false;
-				this.canvas = null;
-				this.ctx = null;
-				this.svg = null;
-				this.mixedLayer = null;
-				this.watermarkOverlay = null;
-				this.pixelInterference = null;
-				this.animationFrame = null;
-				this.watermarks = [];
-				this.interferenceElements = [];
-				this.pageShiftInterval = null;
-				this.visibilityCheckInterval = null;
-				this.userInfo = this.getUserInfo();
+		// 启动防截图防护
+		function startScreenshotProtection() {
+			// 创建固定水印层
+			createFixedWatermarks();
+			
+			// 创建Canvas动态水印层
+			createDynamicWatermark();
+			
+			// 创建SVG干扰层
+			createSVGInterference();
+			
+			// 创建混合层
+			createMixedLayer();
+			
+			// 添加内容防复制
+			enableCopyProtection();
+		}
+		
+		// 停止防截图防护
+		function stopScreenshotProtection() {
+			// 移除所有防护层
+			removeProtectionLayers();
+			
+			// 禁用复制保护
+			disableCopyProtection();
+			
+			console.log('防截图系统已停止');
+		}
+		
+		// 创建固定水印
+		function createFixedWatermarks() {
+			const container = document.createElement('div');
+			container.className = 'fixed-watermarks';
+			container.id = 'fixed-watermarks-container';
+			
+			// 添加固定位置的水印
+			const watermarkTexts = [
+				'内部资料 禁止外传',
+				'保密内容 严禁截图',
+				'版权所有 未经授权禁止使用',
+				'访问者: 访客-' + Math.floor(Math.random() * 10000),
+				'时间: ' + new Date().toLocaleDateString(),
+				'安全级别: 最高'
+			];
+			
+			// 在页面多个位置添加固定水印
+			for (let i = 0; i < 30; i++) {
+				const watermark = document.createElement('div');
+				watermark.className = 'fixed-watermark';
+				
+				// 随机位置
+				const left = Math.random() * 100;
+				const top = Math.random() * 100;
+				
+				// 随机大小
+				const fontSize = Math.random() * 20 + 16;
+				
+				// 随机透明度
+				const opacity = Math.random() * 0.3 + 0.1;
+				
+				// 随机旋转角度
+				const rotate = Math.random() * 90 - 45;
+				
+				watermark.textContent = watermarkTexts[Math.floor(Math.random() * watermarkTexts.length)];
+				watermark.style.left = left + '%';
+				watermark.style.top = top + '%';
+				watermark.style.fontSize = fontSize + 'px';
+				watermark.style.color = `rgba(0,0,0,${opacity})`;
+				watermark.style.transform = `rotate(${rotate}deg)`;
+				watermark.style.zIndex = '999994';
+				
+				container.appendChild(watermark);
 			}
 			
-			start() {
-				if (this.isActive) return;
-				this.isActive = true;
-				
-				this.createCanvasLayer();
-				this.createSVGLayer();
-				this.createCSSMixedLayer();
-				this.createWatermarkOverlay();
-				this.createPixelInterference();
-				this.addContentBlur();
-				
-				this.startWatermarkAnimation();
-				this.startInterferenceAnimation();
-				this.startPageContentShift();
-				this.startVisibilityDetection();
-				this.addContentShiftClass();
-				
-				console.log('综合防护系统已启动');
+			document.body.appendChild(container);
+		}
+		
+		// 创建动态水印
+		function createDynamicWatermark() {
+			const canvas = document.createElement('canvas');
+			canvas.id = 'screenshot-protection-canvas';
+			canvas.style.cssText = `
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				pointer-events: none;
+				z-index: 999998;
+			`;
+			document.body.appendChild(canvas);
+			
+			const ctx = canvas.getContext('2d');
+			
+			// 调整Canvas大小
+			function resizeCanvas() {
+				canvas.width = window.innerWidth;
+				canvas.height = window.innerHeight;
 			}
 			
-			stop() {
-				if (!this.isActive) return;
-				this.isActive = false;
-				
-				if (this.animationFrame) {
-					cancelAnimationFrame(this.animationFrame);
-				}
-				
-				if (this.pageShiftInterval) {
-					clearInterval(this.pageShiftInterval);
-				}
-				
-				if (this.visibilityCheckInterval) {
-					clearInterval(this.visibilityCheckInterval);
-				}
-				
-				this.removeAllLayers();
-				this.removeContentBlur();
-				this.removeContentShiftClass();
-				
-				console.log('综合防护系统已停止');
+			resizeCanvas();
+			window.addEventListener('resize', resizeCanvas);
+			
+			// 创建动态水印数据
+			const watermarks = [];
+			const watermarkTexts = [
+				'防截图保护',
+				'禁止复制',
+				'安全访问',
+				'内部使用',
+				'版权所有',
+				'保密信息'
+			];
+			
+			for (let i = 0; i < 15; i++) {
+				watermarks.push({
+					text: watermarkTexts[Math.floor(Math.random() * watermarkTexts.length)],
+					x: Math.random() * canvas.width,
+					y: Math.random() * canvas.height,
+					speedX: (Math.random() - 0.5) * 0.5,
+					speedY: (Math.random() - 0.5) * 0.5,
+					opacity: Math.random() * 0.15 + 0.05,
+					fontSize: Math.random() * 14 + 12
+				});
 			}
 			
-			createCanvasLayer() {
-				const canvas = document.createElement('canvas');
-				canvas.id = 'screenshot-protection-canvas';
-				canvas.style.cssText = `
-					position: fixed;
-					top: 0;
-					left: 0;
-					width: 100%;
-					height: 100%;
-					pointer-events: none;
-					z-index: 999998;
-				`;
-				document.body.appendChild(canvas);
+			// 动画循环
+			function animate() {
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
 				
-				this.canvas = canvas;
-				this.ctx = canvas.getContext('2d');
-				this.resizeCanvas();
-				
-				window.addEventListener('resize', () => this.resizeCanvas());
-			}
-			
-			resizeCanvas() {
-				if (!this.canvas) return;
-				this.canvas.width = window.innerWidth;
-				this.canvas.height = window.innerHeight;
-			}
-			
-			createSVGLayer() {
-				const svgNS = 'http://www.w3.org/2000/svg';
-				const svg = document.createElementNS(svgNS, 'svg');
-				svg.id = 'screenshot-protection-svg';
-				svg.style.cssText = `
-					position: fixed;
-					top: 0;
-					left: 0;
-					width: 100%;
-					height: 100%;
-					pointer-events: none;
-					z-index: 999997;
-					opacity: 0.05;
-				`;
-				
-				const pattern = document.createElementNS(svgNS, 'pattern');
-				pattern.id = 'protection-pattern';
-				pattern.setAttribute('width', '50');
-				pattern.setAttribute('height', '50');
-				pattern.setAttribute('patternUnits', 'userSpaceOnUse');
-				
-				for (let i = 0; i < 20; i++) {
-					const circle = document.createElementNS(svgNS, 'circle');
-					circle.setAttribute('cx', Math.random() * 50);
-					circle.setAttribute('cy', Math.random() * 50);
-					circle.setAttribute('r', Math.random() * 2 + 0.5);
-					circle.setAttribute('fill', `rgba(0,0,0,${Math.random() * 0.4})`);
-					pattern.appendChild(circle);
-				}
-				
-				const rect = document.createElementNS(svgNS, 'rect');
-				rect.setAttribute('width', '100%');
-				rect.setAttribute('height', '100%');
-				rect.setAttribute('fill', 'url(#protection-pattern)');
-				
-				svg.appendChild(pattern);
-				svg.appendChild(rect);
-				document.body.appendChild(svg);
-				
-				this.svg = svg;
-			}
-			
-			createCSSMixedLayer() {
-				const mixedLayer = document.createElement('div');
-				mixedLayer.className = 'protection-mixed-layer';
-				document.body.appendChild(mixedLayer);
-				
-				this.mixedLayer = mixedLayer;
-			}
-			
-			createWatermarkOverlay() {
-				const overlay = document.createElement('div');
-				overlay.className = 'protection-watermark-overlay';
-				document.body.appendChild(overlay);
-				
-				this.watermarkOverlay = overlay;
-			}
-			
-			createPixelInterference() {
-				const interference = document.createElement('div');
-				interference.className = 'pixel-interference';
-				document.body.appendChild(interference);
-				
-				this.pixelInterference = interference;
-			}
-			
-			addContentBlur() {
-				const mainContent = document.querySelector('.kira-main-content');
-				if (mainContent) {
-					mainContent.classList.add('content-blur-protection');
-				}
-			}
-			
-			removeContentBlur() {
-				const mainContent = document.querySelector('.kira-main-content');
-				if (mainContent) {
-					mainContent.classList.remove('content-blur-protection');
-				}
-			}
-			
-			startWatermarkAnimation() {
-				this.initWatermarks();
-				
-				const animate = () => {
-					if (!this.isActive) return;
-					
-					this.drawWatermarks();
-					this.animationFrame = requestAnimationFrame(animate);
-				};
-				
-				animate();
-			}
-			
-			initWatermarks() {
-				const username = this.userInfo.username;
-				const currentTime = new Date();
-				const watermarkTexts = [
-					`保密内容 - ${username}`,
-					`访问时间: ${currentTime.toLocaleString()}`,
-					`IP: ${this.userInfo.ip}`,
-					`设备: ${this.userInfo.device}`,
-					`版权所有 © ${currentTime.getFullYear()}`,
-					`${window.location.hostname}`,
-					`安全级别: 最高`,
-					`禁止截图`,
-					`内部资料`,
-					`未授权禁止传播`
-				];
-				
-				for (let i = 0; i < 50; i++) {
-					const text = watermarkTexts[Math.floor(Math.random() * watermarkTexts.length)];
-					
-					this.watermarks.push({
-						text: text,
-						x: Math.random() * (this.canvas?.width || window.innerWidth),
-						y: Math.random() * (this.canvas?.height || window.innerHeight),
-						speedX: (Math.random() - 0.5) * 1.5,
-						speedY: (Math.random() - 0.5) * 1.5,
-						opacity: Math.random() * 0.2 + 0.1,
-						angle: Math.random() * 360,
-						fontSize: Math.random() * 16 + 12,
-						color: `rgba(0,0,0,${Math.random() * 0.4 + 0.1})`,
-						lastUpdate: Date.now(),
-						updateInterval: Math.random() * 2000 + 1000
-					});
-				}
-			}
-			
-			drawWatermarks() {
-				if (!this.ctx || !this.canvas) return;
-				
-				this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-				
-				const currentTime = Date.now();
-				
-				this.watermarks.forEach(wm => {
+				watermarks.forEach(wm => {
+					// 更新位置
 					wm.x += wm.speedX;
 					wm.y += wm.speedY;
 					
-					if (wm.x > this.canvas.width + 300) wm.x = -300;
-					if (wm.x < -300) wm.x = this.canvas.width + 300;
-					if (wm.y > this.canvas.height + 300) wm.y = -300;
-					if (wm.y < -300) wm.y = this.canvas.height + 300;
+					// 边界检查
+					if (wm.x > canvas.width) wm.x = -100;
+					if (wm.x < -100) wm.x = canvas.width;
+					if (wm.y > canvas.height) wm.y = -100;
+					if (wm.y < -100) wm.y = canvas.height;
 					
-					if (currentTime - wm.lastUpdate > wm.updateInterval) {
-						wm.opacity = Math.random() * 0.2 + 0.1;
-						wm.fontSize = Math.random() * 16 + 12;
-						wm.color = `rgba(0,0,0,${Math.random() * 0.4 + 0.1})`;
-						wm.lastUpdate = currentTime;
-					}
-					
-					this.ctx.save();
-					this.ctx.globalAlpha = wm.opacity;
-					this.ctx.fillStyle = wm.color;
-					this.ctx.font = `${wm.fontSize}px Arial, sans-serif`;
-					this.ctx.translate(wm.x, wm.y);
-					this.ctx.rotate(wm.angle * Math.PI / 180);
-					this.ctx.fillText(wm.text, 0, 0);
-					this.ctx.restore();
+					// 绘制水印
+					ctx.save();
+					ctx.globalAlpha = wm.opacity;
+					ctx.fillStyle = 'rgba(0,0,0,0.2)';
+					ctx.font = `${wm.fontSize}px Arial, sans-serif`;
+					ctx.fillText(wm.text, wm.x, wm.y);
+					ctx.restore();
 				});
 				
-				this.addVisualNoise();
-			}
-			
-			addVisualNoise() {
-				for (let i = 0; i < 50; i++) {
-					const x = Math.random() * this.canvas.width;
-					const y = Math.random() * this.canvas.height;
-					const size = Math.random() * 4 + 1;
-					const alpha = Math.random() * 0.15;
-					
-					this.ctx.fillStyle = `rgba(0,0,0,${alpha})`;
-					this.ctx.fillRect(x, y, size, size);
-				}
-			}
-			
-			startInterferenceAnimation() {
-				this.initInterferenceElements();
-				
-				setInterval(() => {
-					if (!this.isActive) return;
-					this.updateInterferenceElements();
-				}, 2000);
-			}
-			
-			initInterferenceElements() {
-				if (!this.svg) return;
-				
-				const svgNS = 'http://www.w3.org/2000/svg';
-				
-				for (let i = 0; i < 25; i++) {
-					const line = document.createElementNS(svgNS, 'line');
-					line.setAttribute('x1', Math.random() * 100 + '%');
-					line.setAttribute('y1', Math.random() * 100 + '%');
-					line.setAttribute('x2', Math.random() * 100 + '%');
-					line.setAttribute('y2', Math.random() * 100 + '%');
-					line.setAttribute('stroke', `rgba(0,0,0,${Math.random() * 0.3})`);
-					line.setAttribute('stroke-width', Math.random() * 3 + 0.5);
-					line.setAttribute('stroke-dasharray', `${Math.random() * 15 + 5} ${Math.random() * 15 + 5}`);
-					
-					this.svg.appendChild(line);
-					this.interferenceElements.push({
-						element: line,
-						speedX: (Math.random() - 0.5) * 0.8,
-						speedY: (Math.random() - 0.5) * 0.8
-					});
-				}
-			}
-			
-			updateInterferenceElements() {
-				this.interferenceElements.forEach(item => {
-					const line = item.element;
-					
-					const x1 = parseFloat(line.getAttribute('x1'));
-					const y1 = parseFloat(line.getAttribute('y1'));
-					const x2 = parseFloat(line.getAttribute('x2'));
-					const y2 = parseFloat(line.getAttribute('y2'));
-					
-					line.setAttribute('x1', Math.max(0, Math.min(100, x1 + item.speedX)) + '%');
-					line.setAttribute('y1', Math.max(0, Math.min(100, y1 + item.speedY)) + '%');
-					line.setAttribute('x2', Math.max(0, Math.min(100, x2 - item.speedX)) + '%');
-					line.setAttribute('y2', Math.max(0, Math.min(100, y2 - item.speedY)) + '%');
-					
-					const currentAlpha = parseFloat(line.getAttribute('stroke').match(/[\d.]+/g)[3] || 0.1);
-					const newAlpha = Math.max(0.05, Math.min(0.3, currentAlpha + (Math.random() - 0.5) * 0.08));
-					line.setAttribute('stroke', `rgba(0,0,0,${newAlpha})`);
-				});
-			}
-			
-			startPageContentShift() {
-				this.pageShiftInterval = setInterval(() => {
-					if (!this.isActive) return;
-					
-					const shiftType = Math.floor(Math.random() * 5);
-					const mainContent = document.querySelector('.kira-main-content');
-					
-					if (!mainContent) return;
-					
-					switch(shiftType) {
-						case 0:
-							const translateX = (Math.random() - 0.5) * 5;
-							const translateY = (Math.random() - 0.5) * 5;
-							mainContent.style.transform = `translate(${translateX}px, ${translateY}px)`;
-							break;
-						case 1:
-							const rotate = (Math.random() - 0.5) * 1;
-							mainContent.style.transform = `rotate(${rotate}deg)`;
-							break;
-						case 2:
-							const scale = 1 + (Math.random() - 0.5) * 0.02;
-							mainContent.style.transform = `scale(${scale})`;
-							break;
-						case 3:
-							const hue = Math.random() * 15 - 7.5;
-							mainContent.style.filter = `hue-rotate(${hue}deg)`;
-							break;
-						case 4:
-							const brightness = 1 + (Math.random() - 0.5) * 0.05;
-							mainContent.style.filter = `brightness(${brightness})`;
-							break;
-					}
-					
-					setTimeout(() => {
-						if (mainContent) {
-							mainContent.style.transform = '';
-							mainContent.style.filter = '';
-						}
-					}, 3000);
-					
-				}, Math.random() * 15000 + 8000);
-			}
-			
-			startVisibilityDetection() {
-				this.visibilityCheckInterval = setInterval(() => {
-					if (!this.isActive) return;
-					
-					if (document.hidden) {
-						this.triggerVisibilityAlert();
-					}
-				}, 1000);
-				
-				document.addEventListener('visibilitychange', () => {
-					if (!this.isActive) return;
-					
-					if (document.hidden) {
-						this.triggerVisibilityAlert();
-					}
-				});
-			}
-			
-			triggerVisibilityAlert() {
-				if (this.canvas && this.ctx) {
-					this.ctx.fillStyle = 'rgba(255,255,255,0.9)';
-					this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-					
-					setTimeout(() => {
-						if (this.ctx) {
-							this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-						}
-					}, 150);
-				}
-			}
-			
-			addContentShiftClass() {
-				const mainContent = document.querySelector('.kira-main-content');
-				if (mainContent) {
-					mainContent.classList.add('content-shift-animation');
-				}
-			}
-			
-			removeContentShiftClass() {
-				const mainContent = document.querySelector('.kira-main-content');
-				if (mainContent) {
-					mainContent.classList.remove('content-shift-animation');
-					mainContent.style.transform = '';
-					mainContent.style.filter = '';
-				}
-			}
-			
-			removeAllLayers() {
-				if (this.canvas && this.canvas.parentNode) {
-					this.canvas.parentNode.removeChild(this.canvas);
+				// 添加随机噪声点
+				for (let i = 0; i < 20; i++) {
+					const x = Math.random() * canvas.width;
+					const y = Math.random() * canvas.height;
+					const size = Math.random() * 2 + 1;
+					ctx.fillStyle = `rgba(0,0,0,${Math.random() * 0.1})`;
+					ctx.fillRect(x, y, size, size);
 				}
 				
-				if (this.svg && this.svg.parentNode) {
-					this.svg.parentNode.removeChild(this.svg);
-				}
-				
-				if (this.mixedLayer && this.mixedLayer.parentNode) {
-					this.mixedLayer.parentNode.removeChild(this.mixedLayer);
-				}
-				
-				if (this.watermarkOverlay && this.watermarkOverlay.parentNode) {
-					this.watermarkOverlay.parentNode.removeChild(this.watermarkOverlay);
-				}
-				
-				if (this.pixelInterference && this.pixelInterference.parentNode) {
-					this.pixelInterference.parentNode.removeChild(this.pixelInterference);
-				}
+				requestAnimationFrame(animate);
 			}
 			
-			getUserInfo() {
-				return {
-					username: '访客-' + Math.floor(Math.random() * 10000),
-					ip: '192.168.' + Math.floor(Math.random() * 255) + '.' + Math.floor(Math.random() * 255),
-					device: navigator.platform,
-					browser: navigator.userAgent.split(' ')[0]
-				};
+			animate();
+			
+			// 存储引用以便清理
+			canvas.__resizeHandler = resizeCanvas;
+		}
+		
+		// 创建SVG干扰层
+		function createSVGInterference() {
+			const svgNS = 'http://www.w3.org/2000/svg';
+			const svg = document.createElementNS(svgNS, 'svg');
+			svg.id = 'screenshot-protection-svg';
+			svg.style.cssText = `
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				pointer-events: none;
+				z-index: 999997;
+				opacity: 0.1;
+			`;
+			
+			// 创建干扰图案
+			const pattern = document.createElementNS(svgNS, 'pattern');
+			pattern.id = 'protection-pattern';
+			pattern.setAttribute('width', '20');
+			pattern.setAttribute('height', '20');
+			pattern.setAttribute('patternUnits', 'userSpaceOnUse');
+			
+			// 添加微小干扰点
+			for (let i = 0; i < 10; i++) {
+				const circle = document.createElementNS(svgNS, 'circle');
+				circle.setAttribute('cx', Math.random() * 20);
+				circle.setAttribute('cy', Math.random() * 20);
+				circle.setAttribute('r', Math.random() * 0.5 + 0.3);
+				circle.setAttribute('fill', `rgba(0,0,0,${Math.random() * 0.2})`);
+				pattern.appendChild(circle);
+			}
+			
+			const rect = document.createElementNS(svgNS, 'rect');
+			rect.setAttribute('width', '100%');
+			rect.setAttribute('height', '100%');
+			rect.setAttribute('fill', 'url(#protection-pattern)');
+			
+			svg.appendChild(pattern);
+			svg.appendChild(rect);
+			document.body.appendChild(svg);
+		}
+		
+		// 创建混合层
+		function createMixedLayer() {
+			const mixedLayer = document.createElement('div');
+			mixedLayer.className = 'protection-mixed-layer';
+			mixedLayer.id = 'protection-mixed-layer';
+			document.body.appendChild(mixedLayer);
+		}
+		
+		// 启用复制保护
+		function enableCopyProtection() {
+			// 禁用右键菜单
+			document.addEventListener('contextmenu', preventDefault);
+			
+			// 禁用选择
+			document.addEventListener('selectstart', preventDefault);
+			
+			// 禁用拖拽
+			document.addEventListener('dragstart', preventDefault);
+			
+			function preventDefault(e) {
+				e.preventDefault();
+				return false;
 			}
 		}
+		
+		// 禁用复制保护
+		function disableCopyProtection() {
+			// 移除事件监听器
+			document.removeEventListener('contextmenu', preventDefault);
+			document.removeEventListener('selectstart', preventDefault);
+			document.removeEventListener('dragstart', preventDefault);
+		}
+		
+		// 移除所有防护层
+		function removeProtectionLayers() {
+			// 移除固定水印
+			const fixedWatermarks = document.getElementById('fixed-watermarks-container');
+			if (fixedWatermarks) {
+				fixedWatermarks.remove();
+			}
+			
+			// 移除Canvas
+			const canvas = document.getElementById('screenshot-protection-canvas');
+			if (canvas) {
+				// 移除resize事件监听器
+				if (canvas.__resizeHandler) {
+					window.removeEventListener('resize', canvas.__resizeHandler);
+				}
+				canvas.remove();
+			}
+			
+			// 移除SVG
+			const svg = document.getElementById('screenshot-protection-svg');
+			if (svg) {
+				svg.remove();
+			}
+			
+			// 移除混合层
+			const mixedLayer = document.getElementById('protection-mixed-layer');
+			if (mixedLayer) {
+				mixedLayer.remove();
+			}
+		}
+		
+		// =========== 用户协议管理（只在首页执行） ===========
+		
+		// 非首页：直接显示内容并启动防截图
+		document.addEventListener('DOMContentLoaded', function() {
+			setTimeout(() => {
+				initializeScreenshotProtection();
+			}, 100);
+		});
+		
 		
 		// =========== 原有防护代码（保持不变） ===========
         (function() {
@@ -1279,16 +1136,17 @@
                     const currentTime = Date.now();
                     
                     if (currentTime < expiryTime) {
+                        // 在有效期内，停止防截图系统
+                        if (screenshotProtectionActive) {
+                            stopScreenshotProtection();
+                            screenshotProtectionActive = false;
+                        }
+                        
                         const remainingSeconds = Math.round((expiryTime - currentTime) / 1000);
                         console.log(`防护已关闭`);
                         
+                        // 移除文字选择限制
                         removeTextSelectionProtection();
-                        
-                        // 停止综合防护系统
-                        if (comprehensiveProtection && comprehensiveProtection.isActive) {
-                            comprehensiveProtection.stop();
-                        }
-                        
                         return true;
                     } else {
                         localStorage.removeItem(PROTECTION_EXPIRY_KEY);
@@ -1328,6 +1186,7 @@
                 }, 100);
             }
             
+            // 检查是否在有效期内
             if (isWithinProtectionWindow()) {
                 return;
             }
@@ -1359,12 +1218,6 @@
                         box-shadow: 0 20px 60px rgba(0,0,0,0.15);
                         animation: slideIn 0.5s ease;
                     ">
-                        <div style="
-                            font-size: 60px;
-                            color: #dc3545;
-                            margin-bottom: 20px;
-                        ">⚠️</div>
-                        
                         <h2 style="color: #dc3545; margin-bottom: 10px;">安全提醒</h2>
                         
                         <div style="
@@ -1443,7 +1296,7 @@
                                 background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
                                 color: white;
                                 border: none;
-                                border-radius: 8px;
+                                border-radius: 8路;
                                 font-size: 16px;
                                 font-weight: 500;
                                 cursor: pointer;
@@ -1462,145 +1315,102 @@
                             color: #999;
                             font-size: 13px;
                         ">
-                            <p id="passwordHint">⚠️ 密码验证后防护将关闭30秒，之后需重新输入</p>
+                            <p id="passwordHint">密码验证后防护将关闭30秒，之后需重新输入</p>
                         </div>
                     </div>
                 </div>
-            `;
-            
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes slideIn {
-                    from { opacity: 0; transform: translateY(30px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-                @keyframes slideInRight {
-                    from { transform: translateX(100%); opacity: 0; }
-                    to { transform: translateX(0); opacity: 1; }
-                }
-                @keyframes slideOutRight {
-                    from { transform: translateX(0); opacity: 1; }
-                    to { transform: translateX(100%); opacity: 0; }
-                }
-                @keyframes shake {
-                    0%, 100% { transform: translateX(0); }
-                    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-                    20%, 40%, 60%, 80% { transform: translateX(5px); }
-                }
-            `;
-            
-            setTimeout(() => {
-                document.getElementById('refreshBtn').onclick = () => location.reload();
-                document.getElementById('submitBtn').onclick = checkPassword;
-                document.getElementById('adminPasswordInput').onkeypress = (e) => {
-                    if (e.key === 'Enter') checkPassword();
-                };
-                document.getElementById('adminPasswordInput').focus();
-            }, 100);
-        }
-        
-        function checkPassword() {
-            const input = document.getElementById('adminPasswordInput');
-            const errorDiv = document.getElementById('passwordError');
-            const password = input.value.trim();
-            
-            if (!password) {
-                errorDiv.textContent = '请输入密码';
-                return;
-            }
-            
-            if (password === ADMIN_PASSWORD) {
-                const expiryTime = Date.now() + (30 * 1000);
-                localStorage.setItem(PROTECTION_EXPIRY_KEY, expiryTime.toString());
+                `;
                 
-                removeTextSelectionProtection();
-                
-                if (comprehensiveProtection && comprehensiveProtection.isActive) {
-                    comprehensiveProtection.stop();
-                }
-                
-                errorDiv.textContent = '✓ 密码正确，正在重新加载...';
-                errorDiv.style.color = '#28a745';
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes slideIn {
+                        from { opacity: 0; transform: translateY(30px); }
+                        to { opacity: 1; transform: translateY(0); }
+                    }
+                `;
+                document.head.appendChild(style);
                 
                 setTimeout(() => {
-                    location.reload();
-                }, 1000);
-            } else {
-                errorDiv.textContent = '✗ 密码错误';
-                input.value = '';
-                input.focus();
-            }
-        }
-        
-        document.addEventListener('keydown', function(e) {
-            const blockedKeys = ['F12', 'F8'];
-            const blockedCombinations = [
-                (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)),
-                (e.metaKey && e.altKey && e.key === 'I'),
-                (e.ctrlKey && e.key === 'u'),
-                (e.ctrlKey && e.key === 's'),
-                (e.ctrlKey && e.key === 'p')
-            ];
-            
-            if (blockedKeys.includes(e.key) || blockedCombinations.some(combo => combo)) {
-                e.preventDefault();
-                e.stopPropagation();
-                showPasswordInput();
-                return false;
-            }
-        });
-        
-        document.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-            showPasswordInput();
-            return false;
-        });
-        
-        document.addEventListener('selectstart', function(e) {
-            e.preventDefault();
-            return false;
-        });
-        
-        document.addEventListener('dragstart', function(e) {
-            e.preventDefault();
-            return false;
-        });
-        
-        })();
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const expiry = localStorage.getItem("protection_expiry");
-            if (expiry && Date.now() < parseInt(expiry)) {
-                setTimeout(() => {
-                    const elements = document.querySelectorAll('.protected-content');
-                    elements.forEach(el => {
-                        el.style.userSelect = 'auto';
-                        el.style.webkitUserSelect = 'auto';
-                        el.style.mozUserSelect = 'auto';
-                        el.style.msUserSelect = 'auto';
-                    });
+                    document.getElementById('refreshBtn').onclick = () => location.reload();
+                    document.getElementById('submitBtn').onclick = checkPassword;
+                    document.getElementById('adminPasswordInput').onkeypress = (e) => {
+                        if (e.key === 'Enter') checkPassword();
+                    };
+                    document.getElementById('adminPasswordInput').focus();
                 }, 100);
-                return;
             }
             
-            window.onbeforeprint = function() {
-                document.dispatchEvent(new KeyboardEvent('keydown', {
-                    key: 'p',
-                    ctrlKey: true
-                }));
-                return false;
-            };
+            function checkPassword() {
+                const input = document.getElementById('adminPasswordInput');
+                const errorDiv = document.getElementById('passwordError');
+                const password = input.value.trim();
+                
+                if (!password) {
+                    errorDiv.textContent = '请输入密码';
+                    return;
+                }
+                
+                if (password === ADMIN_PASSWORD) {
+                    const expiryTime = Date.now() + (30 * 1000);
+                    localStorage.setItem(PROTECTION_EXPIRY_KEY, expiryTime.toString());
+                    
+                    removeTextSelectionProtection();
+                    
+                    // 停止防截图系统
+                    if (screenshotProtectionActive) {
+                        stopScreenshotProtection();
+                        screenshotProtectionActive = false;
+                    }
+                    
+                    errorDiv.textContent = '密码正确，正在重新加载...';
+                    errorDiv.style.color = '#28a745';
+                    
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    errorDiv.textContent = '密码错误';
+                    input.value = '';
+                    input.focus();
+                }
+            }
             
             document.addEventListener('keydown', function(e) {
-                if (e.key === 'PrintScreen') {
+                const blockedKeys = ['F12', 'F8'];
+                const blockedCombinations = [
+                    (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)),
+                    (e.metaKey && e.altKey && e.key === 'I'),
+                    (e.ctrlKey && e.key === 'u'),
+                    (e.ctrlKey && e.key === 's'),
+                    (e.ctrlKey && e.key === 'p')
+                ];
+                
+                if (blockedKeys.includes(e.key) || blockedCombinations.some(combo => combo)) {
                     e.preventDefault();
-                    const event = new Event('contextmenu');
-                    document.dispatchEvent(event);
+                    e.stopPropagation();
+                    showPasswordInput();
                     return false;
                 }
             });
-        });
+            
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                showPasswordInput();
+                return false;
+            });
+            
+            document.addEventListener('selectstart', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            document.addEventListener('dragstart', function(e) {
+                e.preventDefault();
+                return false;
+            });
+        })();
 
+        // 兼容性处理
 		window.initializePageProtection = window.initializePageProtection || function() {
 			console.log('基础防护系统已启动');
 		};
