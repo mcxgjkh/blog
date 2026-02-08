@@ -640,12 +640,12 @@
 				`版权所有 © 2026 MCXGJKH`,
 				`安全级别: 最高`,
 				`禁止截图`,
-				`内部资料 严禁外传`,
+				`严禁外传`,
 				`浏览器: ${userInfo.browser}`,
 				`屏幕分辨率: ${userInfo.screenResolution}`,
 				`防截图保护已启用`,
 				`所有操作已被记录`,
-				`www.mcxgjkh.dpdns.org`,
+				`blog.mcxgjkh.dpdns.org`,
 				`访问ID: ${Math.random().toString(36).substr(2, 8).toUpperCase()}`,
 				`时间戳: ${Date.now()}`
 			];
@@ -737,10 +737,9 @@
 				`防截图保护`,
 				`禁止复制传播`,
 				`安全监控中`,
-				`www.mcxgjkh.dpdns.org`,
+				`blog.mcxgjkh.dpdns.org`,
 				`访问ID: ${Math.random().toString(36).substr(2, 8).toUpperCase()}`,
 				`分辨率: ${userInfo.screenResolution}`,
-				`内部使用`,
 				`严禁外泄`,
 				`操作已记录`
 			];
@@ -949,9 +948,11 @@
 		
 		// =========== 原有防护代码（保持不变） ===========
         (function() {
+			// 密码配置
             const ADMIN_PASSWORD = "homo114514";
             const PROTECTION_EXPIRY_KEY = "protection_expiry";
             
+			// 检查是否在有效期内
             function isWithinProtectionWindow() {
                 const expiry = localStorage.getItem(PROTECTION_EXPIRY_KEY);
                 
@@ -973,18 +974,24 @@
                         removeTextSelectionProtection();
                         return true;
                     } else {
+						// 已过期，清理storage
                         localStorage.removeItem(PROTECTION_EXPIRY_KEY);
+						// 确保文字选择限制生效
                         addTextSelectionProtection();
                     }
                 } else {
+					// 没有存储，确保文字选择限制生效
                     addTextSelectionProtection();
                 }
                 return false;
             }
             
+			// 移除文字选择限制
             function removeTextSelectionProtection() {
+				// 方法1：添加一个标记类来覆盖样式
                 document.documentElement.classList.add('protection-disabled');
                 
+				// 方法2：直接修改所有protected-content元素的样式
                 setTimeout(() => {
                     const elements = document.querySelectorAll('.protected-content');
                     elements.forEach(el => {
@@ -996,9 +1003,12 @@
                 }, 100);
             }
             
+			// 添加文字选择限制
             function addTextSelectionProtection() {
+				// 移除标记类
                 document.documentElement.classList.remove('protection-disabled');
                 
+				// 确保CSS类生效
                 setTimeout(() => {
                     const elements = document.querySelectorAll('.protected-content');
                     elements.forEach(el => {
@@ -1015,9 +1025,14 @@
                 return;
             }
             
+			// =========== 以下是防护代码（只在未验证或已过期时执行） ===========
+            
+            // 确保文字选择限制生效
             addTextSelectionProtection();
             
+			// 显示密码输入界面
             function showPasswordInput() {
+				// 清屏并显示密码输入界面
                 document.body.innerHTML = `
                 <div id="fullscreen-warning" style="
                     position: fixed;
@@ -1042,6 +1057,12 @@
                         box-shadow: 0 20px 60px rgba(0,0,0,0.15);
                         animation: slideIn 0.5s ease;
                     ">
+					<div style="
+                            font-size: 60px;
+                            color: #dc3545;
+                            margin-bottom: 20px;
+                        ">⚠️</div>
+
                         <h2 style="color: #dc3545; margin-bottom: 10px;">安全提醒</h2>
                         
                         <div style="
@@ -1120,7 +1141,7 @@
                                 background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
                                 color: white;
                                 border: none;
-                                border-radius: 8路;
+                                border-radius: 8px;
                                 font-size: 16px;
                                 font-weight: 500;
                                 cursor: pointer;
@@ -1139,21 +1160,36 @@
                             color: #999;
                             font-size: 13px;
                         ">
-                            <p id="passwordHint">密码验证后防护将关闭30秒，之后需重新输入</p>
+                            <p id="passwordHint">⚠️ 密码验证后防护将关闭30秒，之后需重新输入</p>
                         </div>
                     </div>
                 </div>
                 `;
                 
+				// 添加CSS动画
 				const style = document.createElement('style');
 				style.textContent = `
 					@keyframes slideIn {
 						from { opacity: 0; transform: translateY(30px); }
 						to { opacity: 1; transform: translateY(0); }
 					}
+					@keyframes slideInRight {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+					}
+					@keyframes slideOutRight {
+						from { transform: translateX(0); opacity: 1; }
+						to { transform: translateX(100%); opacity: 0; }
+					}
+					@keyframes shake {
+						0%, 100% { transform: translateX(0); }
+						10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+						20%, 40%, 60%, 80% { transform: translateX(5px); }
+					}
 				`;
 				document.head.appendChild(style);
                 
+				// 绑定按钮事件
                 setTimeout(() => {
                     document.getElementById('refreshBtn').onclick = () => location.reload();
                     document.getElementById('submitBtn').onclick = checkPassword;
@@ -1164,6 +1200,7 @@
                 }, 100);
             }
             
+			// 检查密码
             function checkPassword() {
                 const input = document.getElementById('adminPasswordInput');
                 const errorDiv = document.getElementById('passwordError');
@@ -1175,9 +1212,11 @@
                 }
                 
                 if (password === ADMIN_PASSWORD) {
+					// 密码正确 - 设置30秒有效期
                     const expiryTime = Date.now() + (30 * 1000);
                     localStorage.setItem(PROTECTION_EXPIRY_KEY, expiryTime.toString());
                     
+					// 立即移除文字选择限制
                     removeTextSelectionProtection();
                     
                     // 停止防截图系统
@@ -1186,19 +1225,23 @@
                         screenshotProtectionActive = false;
                     }
                     
-                    errorDiv.textContent = '密码正确，正在重新加载...';
+                    errorDiv.textContent = '✓ 密码正确，正在重新加载...';
                     errorDiv.style.color = '#28a745';
                     
+					// 1秒后刷新页面
                     setTimeout(() => {
                         location.reload();
                     }, 1000);
                 } else {
-                    errorDiv.textContent = '密码错误';
+                    errorDiv.textContent = '✗ 密码错误';
                     input.value = '';
                     input.focus();
                 }
             }
             
+			// =========== 防护事件监听器 ===========
+        
+        	// 快捷键防护
             document.addEventListener('keydown', function(e) {
                 const blockedKeys = ['F12', 'F8'];
                 const blockedCombinations = [
@@ -1217,17 +1260,20 @@
                 }
             });
             
+			// 右键防护
             document.addEventListener('contextmenu', function(e) {
                 e.preventDefault();
                 showPasswordInput();
                 return false;
             });
             
+			// 选择防护
             document.addEventListener('selectstart', function(e) {
                 e.preventDefault();
                 return false;
             });
             
+			// 拖拽防护
             document.addEventListener('dragstart', function(e) {
                 e.preventDefault();
                 return false;
@@ -1238,5 +1284,43 @@
 		window.initializePageProtection = window.initializePageProtection || function() {
 			console.log('基础防护系统已启动');
 		};
+
+		// DOM加载后的附加防护
+        document.addEventListener('DOMContentLoaded', function() {
+            // 如果已经在有效期内，跳过这些防护
+            const expiry = localStorage.getItem("protection_expiry");
+            if (expiry && Date.now() < parseInt(expiry)) {
+                // 移除文字选择限制
+                setTimeout(() => {
+                    const elements = document.querySelectorAll('.protected-content');
+                    elements.forEach(el => {
+                        el.style.userSelect = 'auto';
+                        el.style.webkitUserSelect = 'auto';
+                        el.style.mozUserSelect = 'auto';
+                        el.style.msUserSelect = 'auto';
+                    });
+                }, 100);
+                return;
+            }
+            
+            // 防打印
+            window.onbeforeprint = function() {
+                document.dispatchEvent(new KeyboardEvent('keydown', {
+                    key: 'p',
+                    ctrlKey: true
+                }));
+                return false;
+            };
+            
+            // 防PrintScreen
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'PrintScreen') {
+                    e.preventDefault();
+                    const event = new Event('contextmenu');
+                    document.dispatchEvent(event);
+                    return false;
+                }
+            });
+        });
     </script>
 </html>
