@@ -94,7 +94,7 @@
 			height: 100%;
 			pointer-events: none;
 			z-index: 999997;
-			opacity: 0.05;
+			opacity: 0.1;
 		}
 		
 		.protection-mixed-layer {
@@ -109,8 +109,8 @@
 				45deg,
 				transparent,
 				transparent 10px,
-				rgba(0,0,0,0.01) 10px,
-				rgba(0,0,0,0.01) 20px
+				rgba(0,0,0,0.02) 10px,
+				rgba(0,0,0,0.02) 20px
 			);
 			mix-blend-mode: multiply;
 			animation: subtleShift 60s infinite linear;
@@ -138,8 +138,8 @@
 				45deg,
 				transparent,
 				transparent 20px,
-				rgba(255,255,255,0.01) 20px,
-				rgba(255,255,255,0.01) 40px
+				rgba(255,255,255,0.03) 20px,
+				rgba(255,255,255,0.03) 40px
 			);
 		}
 		
@@ -158,8 +158,8 @@
 		
 		.fixed-watermark {
 			position: absolute;
-			font-size: 16px;
-			color: rgba(0,0,0,0.12); /* 降低透明度，更淡 */
+			font-size: 18px;
+			color: rgba(0,0,0,0.25); /* 降低透明度，更淡 */
 			transform: rotate(-45deg);
 			white-space: nowrap;
 			font-weight: 400;
@@ -174,14 +174,14 @@
 			left: 50%;
 			transform: translate(-50%, -50%);
 			font-size: 20px;
-			color: rgba(0,0,0,0.18); /* 稍微深一点，但还是很淡 */
+			color: rgba(0,0,0,0.30); /* 稍微深一点，但还是很淡 */
 			font-weight: 500;
 			z-index: 999994;
 			pointer-events: none;
 			white-space: nowrap;
 			text-align: center;
 			padding: 10px 20px;
-			background: rgba(255,255,255,0.05);
+			background: rgba(255,255,255,0.1);
 			border-radius: 8px;
 			animation: ipFloat 15s ease-in-out infinite;
 		}
@@ -203,8 +203,8 @@
 			pointer-events: none;
 			z-index: 999993;
 			background-image: 
-				radial-gradient(circle at 25% 25%, rgba(0,0,0,0.008) 1px, transparent 1px),
-				radial-gradient(circle at 75% 75%, rgba(0,0,0,0.008) 1px, transparent 1px);
+				radial-gradient(circle at 25% 25%, rgba(0,0,0,0.02) 1px, transparent 1px),
+				radial-gradient(circle at 75% 75%, rgba(0,0,0,0.02) 1px, transparent 1px);
 			background-size: 50px 50px, 50px 50px;
 		}
 		
@@ -212,14 +212,14 @@
 		.mobile-ip-watermark {
 			position: fixed;
 			font-size: 18px;
-			color: rgba(0,0,0,0.15);
+			color: rgba(0, 0, 0, 0.2);
 			font-weight: 500;
 			z-index: 999994;
 			pointer-events: none;
 			white-space: nowrap;
 			animation: moveAround 20s linear infinite;
 			padding: 8px 15px;
-			background: rgba(255,255,255,0.03);
+			background: rgba(255,255,255,0.1);
 			border-radius: 6px;
 		}
 		
@@ -761,6 +761,7 @@
 			const watermarkTexts = [
 				`保密内容 - ${userInfo.username}`,
 				`访问时间: ${userInfo.accessTime}`,
+				`访问者IP: ${userInfo.publicIP}`,
 				`设备信息: ${userInfo.device}`,
 				`版权所有 © 2026 MCXGJKH`,
 				`安全级别: 最高`,
@@ -806,7 +807,7 @@
 				
 				// 优化样式 - 更淡，确保在屏幕内
 				const fontSize = Math.random() * 4 + 14; // 14-18px
-				const opacity = Math.random() * 0.08 + 0.16; // 0.08-0.16，更淡
+				const opacity = Math.random() * 0.15 + 0.115; // 0.08-0.16，更淡
 				const fontWeight = Math.random() > 0.7 ? '500' : '400';
 				
 				watermark.style.left = pos.left + '%';
@@ -904,7 +905,7 @@
 			];
 			
 			// 创建水印 - 优化数量，确保在屏幕内
-			for (let i = 0; i < 15; i++) {
+			for (let i = 0; i < 20; i++) {
 				const textIndex = Math.floor(Math.random() * watermarkTexts.length);
 				watermarks.push({
 					text: watermarkTexts[textIndex],
@@ -915,8 +916,8 @@
 					opacity: Math.random() * 0.12 + 0.12, // 更淡
 					fontSize: Math.random() * 8 + 10,
 					fontWeight: Math.random() > 0.8 ? 'bold' : 'normal',
-					color: `rgba(0,0,0,${Math.random() * 0.15 + 0.05})`,
-					angle: (Math.random() - 0.5) * 20 // 减少旋转角度
+					color: `rgba(0,0,0,${Math.random() * 0.15 + 0.15})`,
+					angle: (Math.random() - 0.5) * 25 // 减少旋转角度
 				});
 			}
 			
@@ -959,11 +960,11 @@
 				});
 				
 				// 添加随机噪声点 - 减少干扰
-				for (let i = 0; i < 20; i++) {
+				for (let i = 0; i < 35; i++) {
 					const x = Math.random() * canvas.width;
 					const y = Math.random() * canvas.height;
-					const size = Math.random() * 2 + 0.5;
-					const alpha = Math.random() * 0.08;
+					const size = Math.random() * 2 + 1.2;
+					const alpha = Math.random() * 0.12;
 					
 					ctx.fillStyle = `rgba(0,0,0,${alpha})`;
 					ctx.fillRect(x, y, size, size);
@@ -991,7 +992,7 @@
 				height: 100%;
 				pointer-events: none;
 				z-index: 999997;
-				opacity: 0.05;
+				opacity: 0.1;
 			`;
 			
 			// 创建干扰图案
@@ -1019,7 +1020,7 @@
 				line.setAttribute('x2', Math.random() * 30);
 				line.setAttribute('y2', Math.random() * 30);
 				line.setAttribute('stroke', `rgba(0,0,0,${Math.random() * 0.08})`);
-				line.setAttribute('stroke-width', Math.random() * 0.3 + 0.1);
+				line.setAttribute('stroke-width', Math.random() * 0.3 + 0.3);
 				pattern.appendChild(line);
 			}
 			
@@ -1361,16 +1362,14 @@
 					}
 				`;
 				document.head.appendChild(style);
-                
-				// 绑定按钮事件
-                setTimeout(() => {
-                    document.getElementById('refreshBtn').onclick = () => location.reload();
-                    document.getElementById('submitBtn').onclick = checkPassword;
-                    document.getElementById('adminPasswordInput').onkeypress = (e) => {
-                        if (e.key === 'Enter') checkPassword();
-                    };
-                    document.getElementById('adminPasswordInput').focus();
-                }, 100);
+
+				// 立即绑定按钮事件
+				document.getElementById('refreshBtn').onclick = () => location.reload();
+				document.getElementById('submitBtn').onclick = checkPassword;
+				document.getElementById('adminPasswordInput').onkeypress = (e) => {
+					if (e.key === 'Enter') checkPassword();
+				};
+				document.getElementById('adminPasswordInput').focus();
             }
             
 			// 检查密码
