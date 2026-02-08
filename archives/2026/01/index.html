@@ -1026,7 +1026,7 @@
 				
 				// 优化样式 - 更淡，确保在屏幕内
 				const fontSize = Math.random() * 4 + 14; // 14-18px
-				const opacity = Math.random() * 0.08 + 0.08; // 0.08-0.16，更淡
+				const opacity = Math.random() * 0.08 + 0.16; // 0.08-0.16，更淡
 				const fontWeight = Math.random() > 0.7 ? '500' : '400';
 				
 				watermark.style.left = pos.left + '%';
@@ -1061,8 +1061,8 @@
 			const ipInfo = `
 				<div style="margin-bottom: 5px; font-size: 22px; font-weight: 600;">访问者IP</div>
 				<div style="font-size: 18px; margin-bottom: 5px;">${userInfo.publicIP}</div>
-				<div style="font-size: 14px; opacity: 0.7;">${userInfo.accessTime}</div>
-				<div style="font-size: 14px; opacity: 0.7;">${userInfo.device}</div>
+				<div style="font-size: 14px; opacity: 1.0;">${userInfo.accessTime}</div>
+				<div style="font-size: 14px; opacity: 1.0;">${userInfo.device}</div>
 			`;
 			
 			ipWatermark.innerHTML = ipInfo;
@@ -1132,7 +1132,7 @@
 					y: Math.random() * (canvas.height - 100) + 50,
 					speedX: (Math.random() - 0.5) * 0.5, // 降低速度
 					speedY: (Math.random() - 0.5) * 0.5,
-					opacity: Math.random() * 0.12 + 0.03, // 更淡
+					opacity: Math.random() * 0.12 + 0.12, // 更淡
 					fontSize: Math.random() * 8 + 10,
 					fontWeight: Math.random() > 0.8 ? 'bold' : 'normal',
 					color: `rgba(0,0,0,${Math.random() * 0.15 + 0.05})`,
