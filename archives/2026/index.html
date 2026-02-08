@@ -72,10 +72,10 @@
 			user-select: auto;
 			-webkit-user-select: auto;
 			-moz-user-select: auto;
-			-ms-user-select: auto;
+			-ms-userSelect: auto;
 		}
 
-		/* =========== 增强防截图样式 =========== */
+		/* =========== 优化水印样式 =========== */
 		#screenshot-protection-canvas {
 			position: fixed;
 			top: 0;
@@ -94,7 +94,7 @@
 			height: 100%;
 			pointer-events: none;
 			z-index: 999997;
-			opacity: 0.1;
+			opacity: 0.05;
 		}
 		
 		.protection-mixed-layer {
@@ -109,8 +109,8 @@
 				45deg,
 				transparent,
 				transparent 10px,
-				rgba(0,0,0,0.02) 10px,
-				rgba(0,0,0,0.02) 20px
+				rgba(0,0,0,0.01) 10px,
+				rgba(0,0,0,0.01) 20px
 			);
 			mix-blend-mode: multiply;
 			animation: subtleShift 60s infinite linear;
@@ -125,7 +125,7 @@
 			transition: transform 0.5s ease, filter 0.5s ease;
 		}
 		
-		/* 增强水印效果 - 更可见 */
+		/* 优化水印效果 - 更淡更可读 */
 		.protection-watermark-overlay {
 			position: fixed;
 			top: 0;
@@ -138,12 +138,12 @@
 				45deg,
 				transparent,
 				transparent 20px,
-				rgba(255,255,255,0.03) 20px,
-				rgba(255,255,255,0.03) 40px
+				rgba(255,255,255,0.01) 20px,
+				rgba(255,255,255,0.01) 40px
 			);
 		}
 		
-		/* 固定水印层 - 增强版 */
+		/* 固定水印层 - 优化版：更淡，确保在屏幕内 */
 		.fixed-watermarks {
 			position: fixed;
 			top: 0;
@@ -153,20 +153,47 @@
 			pointer-events: none;
 			z-index: 999994;
 			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			overflow: hidden; /* 确保水印不会超出屏幕 */
 		}
 		
 		.fixed-watermark {
 			position: absolute;
-			font-size: 18px;
-			color: rgba(0,0,0,0.25);
+			font-size: 16px;
+			color: rgba(0,0,0,0.12); /* 降低透明度，更淡 */
 			transform: rotate(-45deg);
 			white-space: nowrap;
-			font-weight: 500;
-			letter-spacing: 0.5px;
-			text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
+			font-weight: 400;
+			letter-spacing: 0.3px;
+			text-shadow: 1px 1px 2px rgba(255,255,255,0.3);
 		}
 		
-		/* 像素级干扰 */
+		/* 重要IP水印 - 放在屏幕中间，可读性更高 */
+		.ip-watermark {
+			position: fixed;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			font-size: 20px;
+			color: rgba(0,0,0,0.18); /* 稍微深一点，但还是很淡 */
+			font-weight: 500;
+			z-index: 999994;
+			pointer-events: none;
+			white-space: nowrap;
+			text-align: center;
+			padding: 10px 20px;
+			background: rgba(255,255,255,0.05);
+			border-radius: 8px;
+			animation: ipFloat 15s ease-in-out infinite;
+		}
+		
+		@keyframes ipFloat {
+			0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+			25% { transform: translate(-50%, -50%) translateY(-20px) translateX(20px); }
+			50% { transform: translate(-50%, -50%) translateY(0) translateX(40px); }
+			75% { transform: translate(-50%, -50%) translateY(20px) translateX(20px); }
+		}
+		
+		/* 像素级干扰 - 更淡 */
 		.pixel-interference {
 			position: fixed;
 			top: 0;
@@ -176,9 +203,32 @@
 			pointer-events: none;
 			z-index: 999993;
 			background-image: 
-				radial-gradient(circle at 25% 25%, rgba(0,0,0,0.02) 1px, transparent 1px),
-				radial-gradient(circle at 75% 75%, rgba(0,0,0,0.02) 1px, transparent 1px);
+				radial-gradient(circle at 25% 25%, rgba(0,0,0,0.008) 1px, transparent 1px),
+				radial-gradient(circle at 75% 75%, rgba(0,0,0,0.008) 1px, transparent 1px);
 			background-size: 50px 50px, 50px 50px;
+		}
+		
+		/* 移动IP水印 - 在屏幕上缓慢移动 */
+		.mobile-ip-watermark {
+			position: fixed;
+			font-size: 18px;
+			color: rgba(0,0,0,0.15);
+			font-weight: 500;
+			z-index: 999994;
+			pointer-events: none;
+			white-space: nowrap;
+			animation: moveAround 20s linear infinite;
+			padding: 8px 15px;
+			background: rgba(255,255,255,0.03);
+			border-radius: 6px;
+		}
+		
+		@keyframes moveAround {
+			0% { top: 20%; left: 20%; }
+			25% { top: 20%; left: 80%; }
+			50% { top: 80%; left: 80%; }
+			75% { top: 80%; left: 20%; }
+			100% { top: 20%; left: 20%; }
 		}
 	</style>
 
@@ -894,11 +944,11 @@
 			// 更新访问时间（每次启动时）
 			userInfo.accessTime = getFormattedTime();
 			
-			// 创建固定水印层
-			createFixedWatermarks();
+			// 创建固定水印层（优化版）
+			createOptimizedWatermarks();
 			
-			// 创建Canvas动态水印层
-			createDynamicWatermark();
+			// 创建Canvas动态水印层（优化版）
+			createOptimizedDynamicWatermark();
 			
 			// 创建SVG干扰层
 			createSVGInterference();
@@ -921,17 +971,16 @@
 			console.log('防截图系统已停止');
 		}
 		
-		// 创建固定水印 - 增强版
-		function createFixedWatermarks() {
+		// 创建优化水印层 - 确保水印在屏幕内、更淡、IP可读
+		function createOptimizedWatermarks() {
 			const container = document.createElement('div');
 			container.className = 'fixed-watermarks';
 			container.id = 'fixed-watermarks-container';
 			
-			// 增强水印文本数组，包含详细用户信息
+			// 水印文本数组，包含详细用户信息
 			const watermarkTexts = [
 				`保密内容 - ${userInfo.username}`,
 				`访问时间: ${userInfo.accessTime}`,
-				`访问者IP: ${userInfo.publicIP}`,
 				`设备信息: ${userInfo.device}`,
 				`版权所有 © 2026 MCXGJKH`,
 				`安全级别: 最高`,
@@ -946,23 +995,24 @@
 				`时间戳: ${Date.now()}`
 			];
 			
-			// 在页面多个位置添加固定水印
+			// 在页面安全位置添加固定水印（确保在屏幕内）
+			// 使用安全的边距，确保水印不会超出屏幕
 			const positions = [
-				{ left: 10, top: 10, rotate: -30 },
-				{ left: 50, top: 15, rotate: -45 },
-				{ left: 90, top: 20, rotate: -15 },
-				{ left: 5, top: 30, rotate: -60 },
-				{ left: 70, top: 25, rotate: -75 },
-				{ left: 30, top: 50, rotate: -25 },
-				{ left: 85, top: 55, rotate: -40 },
-				{ left: 15, top: 70, rotate: -55 },
-				{ left: 60, top: 75, rotate: -10 },
-				{ left: 45, top: 85, rotate: -20 },
-				{ left: 20, top: 95, rotate: -35 },
-				{ left: 80, top: 90, rotate: -50 },
-				{ left: 10, top: 40, rotate: -65 },
-				{ left: 90, top: 45, rotate: -5 },
-				{ left: 40, top: 65, rotate: -70 }
+				{ left: 15, top: 15, rotate: -30 },
+				{ left: 50, top: 20, rotate: -45 },
+				{ left: 85, top: 25, rotate: -15 },
+				{ left: 10, top: 35, rotate: -60 },
+				{ left: 75, top: 30, rotate: -75 },
+				{ left: 25, top: 55, rotate: -25 },
+				{ left: 80, top: 60, rotate: -40 },
+				{ left: 20, top: 75, rotate: -55 },
+				{ left: 65, top: 80, rotate: -10 },
+				{ left: 40, top: 90, rotate: -20 },
+				{ left: 15, top: 70, rotate: -35 },
+				{ left: 90, top: 65, rotate: -50 },
+				{ left: 30, top: 45, rotate: -65 },
+				{ left: 70, top: 50, rotate: -5 },
+				{ left: 45, top: 85, rotate: -70 }
 			];
 			
 			// 创建水印
@@ -974,10 +1024,10 @@
 				const textIndex = index % watermarkTexts.length;
 				watermark.textContent = watermarkTexts[textIndex];
 				
-				// 随机样式变化
-				const fontSize = Math.random() * 6 + 14; // 14-20px
-				const opacity = Math.random() * 0.2 + 0.15; // 0.15-0.35
-				const fontWeight = Math.random() > 0.7 ? '600' : '500';
+				// 优化样式 - 更淡，确保在屏幕内
+				const fontSize = Math.random() * 4 + 14; // 14-18px
+				const opacity = Math.random() * 0.08 + 0.08; // 0.08-0.16，更淡
+				const fontWeight = Math.random() > 0.7 ? '500' : '400';
 				
 				watermark.style.left = pos.left + '%';
 				watermark.style.top = pos.top + '%';
@@ -986,17 +1036,50 @@
 				watermark.style.transform = `rotate(${pos.rotate}deg)`;
 				watermark.style.fontWeight = fontWeight;
 				watermark.style.zIndex = '999994';
-				watermark.style.textDecoration = Math.random() > 0.8 ? 'underline' : 'none';
-				watermark.style.letterSpacing = (Math.random() * 0.5) + 'px';
+				watermark.style.textDecoration = Math.random() > 0.9 ? 'underline' : 'none';
+				watermark.style.letterSpacing = (Math.random() * 0.3) + 'px';
 				
 				container.appendChild(watermark);
 			});
 			
 			document.body.appendChild(container);
+			
+			// 创建重要IP水印 - 放在屏幕中间
+			createImportantIPWatermark();
+			
+			// 创建移动IP水印 - 在屏幕上缓慢移动
+			createMobileIPWatermark();
 		}
 		
-		// 创建动态水印 - 增强版
-		function createDynamicWatermark() {
+		// 创建重要IP水印 - 放在屏幕中间，可读性高
+		function createImportantIPWatermark() {
+			const ipWatermark = document.createElement('div');
+			ipWatermark.className = 'ip-watermark';
+			ipWatermark.id = 'important-ip-watermark';
+			
+			// 创建详细的IP信息
+			const ipInfo = `
+				<div style="margin-bottom: 5px; font-size: 22px; font-weight: 600;">访问者IP</div>
+				<div style="font-size: 18px; margin-bottom: 5px;">${userInfo.publicIP}</div>
+				<div style="font-size: 14px; opacity: 0.7;">${userInfo.accessTime}</div>
+				<div style="font-size: 14px; opacity: 0.7;">${userInfo.device}</div>
+			`;
+			
+			ipWatermark.innerHTML = ipInfo;
+			document.body.appendChild(ipWatermark);
+		}
+		
+		// 创建移动IP水印 - 在屏幕上缓慢移动
+		function createMobileIPWatermark() {
+			const mobileIP = document.createElement('div');
+			mobileIP.className = 'mobile-ip-watermark';
+			mobileIP.id = 'mobile-ip-watermark';
+			mobileIP.textContent = `IP: ${userInfo.publicIP} | ${userInfo.accessTime.split(' ')[1]}`;
+			document.body.appendChild(mobileIP);
+		}
+		
+		// 创建优化动态水印 - 更淡，确保在屏幕内
+		function createOptimizedDynamicWatermark() {
 			const canvas = document.createElement('canvas');
 			canvas.id = 'screenshot-protection-canvas';
 			canvas.style.cssText = `
@@ -1021,7 +1104,7 @@
 			resizeCanvas();
 			window.addEventListener('resize', resizeCanvas);
 			
-			// 创建动态水印数据 - 使用增强信息
+			// 创建动态水印数据 - 使用优化信息
 			const watermarks = [];
 			const watermarkTexts = [
 				`保密内容 - ${userInfo.username}`,
@@ -1040,20 +1123,20 @@
 				`操作已记录`
 			];
 			
-			// 创建更多水印
-			for (let i = 0; i < 20; i++) {
+			// 创建水印 - 优化数量，确保在屏幕内
+			for (let i = 0; i < 15; i++) {
 				const textIndex = Math.floor(Math.random() * watermarkTexts.length);
 				watermarks.push({
 					text: watermarkTexts[textIndex],
-					x: Math.random() * canvas.width,
-					y: Math.random() * canvas.height,
-					speedX: (Math.random() - 0.5) * 0.8,
-					speedY: (Math.random() - 0.5) * 0.8,
-					opacity: Math.random() * 0.25 + 0.05,
-					fontSize: Math.random() * 10 + 10,
-					fontWeight: Math.random() > 0.7 ? 'bold' : 'normal',
-					color: `rgba(0,0,0,${Math.random() * 0.3 + 0.1})`,
-					angle: (Math.random() - 0.5) * 30
+					x: Math.random() * (canvas.width - 200) + 100, // 确保在屏幕内
+					y: Math.random() * (canvas.height - 100) + 50,
+					speedX: (Math.random() - 0.5) * 0.5, // 降低速度
+					speedY: (Math.random() - 0.5) * 0.5,
+					opacity: Math.random() * 0.12 + 0.03, // 更淡
+					fontSize: Math.random() * 8 + 10,
+					fontWeight: Math.random() > 0.8 ? 'bold' : 'normal',
+					color: `rgba(0,0,0,${Math.random() * 0.15 + 0.05})`,
+					angle: (Math.random() - 0.5) * 20 // 减少旋转角度
 				});
 			}
 			
@@ -1066,11 +1149,23 @@
 					wm.x += wm.speedX;
 					wm.y += wm.speedY;
 					
-					// 边界检查
-					if (wm.x > canvas.width + 150) wm.x = -150;
-					if (wm.x < -150) wm.x = canvas.width + 150;
-					if (wm.y > canvas.height + 150) wm.y = -150;
-					if (wm.y < -150) wm.y = canvas.height + 150;
+					// 边界检查 - 确保在屏幕内
+					if (wm.x > canvas.width - 150) {
+						wm.x = canvas.width - 150;
+						wm.speedX = -Math.abs(wm.speedX);
+					}
+					if (wm.x < 150) {
+						wm.x = 150;
+						wm.speedX = Math.abs(wm.speedX);
+					}
+					if (wm.y > canvas.height - 80) {
+						wm.y = canvas.height - 80;
+						wm.speedY = -Math.abs(wm.speedY);
+					}
+					if (wm.y < 80) {
+						wm.y = 80;
+						wm.speedY = Math.abs(wm.speedY);
+					}
 					
 					// 绘制水印
 					ctx.save();
@@ -1083,25 +1178,15 @@
 					ctx.restore();
 				});
 				
-				// 添加随机噪声点 - 增强干扰
-				for (let i = 0; i < 40; i++) {
+				// 添加随机噪声点 - 减少干扰
+				for (let i = 0; i < 20; i++) {
 					const x = Math.random() * canvas.width;
 					const y = Math.random() * canvas.height;
-					const size = Math.random() * 3 + 1;
-					const alpha = Math.random() * 0.15;
+					const size = Math.random() * 2 + 0.5;
+					const alpha = Math.random() * 0.08;
 					
 					ctx.fillStyle = `rgba(0,0,0,${alpha})`;
 					ctx.fillRect(x, y, size, size);
-				}
-				
-				// 添加干扰线
-				if (Math.random() > 0.7) {
-					ctx.beginPath();
-					ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
-					ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height);
-					ctx.strokeStyle = `rgba(0,0,0,${Math.random() * 0.1})`;
-					ctx.lineWidth = Math.random() * 2 + 0.5;
-					ctx.stroke();
 				}
 				
 				requestAnimationFrame(animate);
@@ -1126,35 +1211,35 @@
 				height: 100%;
 				pointer-events: none;
 				z-index: 999997;
-				opacity: 0.1;
+				opacity: 0.05;
 			`;
 			
 			// 创建干扰图案
 			const pattern = document.createElementNS(svgNS, 'pattern');
 			pattern.id = 'protection-pattern';
-			pattern.setAttribute('width', '25');
-			pattern.setAttribute('height', '25');
+			pattern.setAttribute('width', '30');
+			pattern.setAttribute('height', '30');
 			pattern.setAttribute('patternUnits', 'userSpaceOnUse');
 			
 			// 添加微小干扰元素
-			for (let i = 0; i < 15; i++) {
+			for (let i = 0; i < 10; i++) {
 				const circle = document.createElementNS(svgNS, 'circle');
-				circle.setAttribute('cx', Math.random() * 25);
-				circle.setAttribute('cy', Math.random() * 25);
-				circle.setAttribute('r', Math.random() * 1 + 0.3);
-				circle.setAttribute('fill', `rgba(0,0,0,${Math.random() * 0.2})`);
+				circle.setAttribute('cx', Math.random() * 30);
+				circle.setAttribute('cy', Math.random() * 30);
+				circle.setAttribute('r', Math.random() * 0.8 + 0.2);
+				circle.setAttribute('fill', `rgba(0,0,0,${Math.random() * 0.1})`);
 				pattern.appendChild(circle);
 			}
 			
 			// 添加干扰线
-			for (let i = 0; i < 5; i++) {
+			for (let i = 0; i < 3; i++) {
 				const line = document.createElementNS(svgNS, 'line');
-				line.setAttribute('x1', Math.random() * 25);
-				line.setAttribute('y1', Math.random() * 25);
-				line.setAttribute('x2', Math.random() * 25);
-				line.setAttribute('y2', Math.random() * 25);
-				line.setAttribute('stroke', `rgba(0,0,0,${Math.random() * 0.15})`);
-				line.setAttribute('stroke-width', Math.random() * 0.5 + 0.2);
+				line.setAttribute('x1', Math.random() * 30);
+				line.setAttribute('y1', Math.random() * 30);
+				line.setAttribute('x2', Math.random() * 30);
+				line.setAttribute('y2', Math.random() * 30);
+				line.setAttribute('stroke', `rgba(0,0,0,${Math.random() * 0.08})`);
+				line.setAttribute('stroke-width', Math.random() * 0.3 + 0.1);
 				pattern.appendChild(line);
 			}
 			
@@ -1207,6 +1292,18 @@
 			const fixedWatermarks = document.getElementById('fixed-watermarks-container');
 			if (fixedWatermarks) {
 				fixedWatermarks.remove();
+			}
+			
+			// 移除重要IP水印
+			const ipWatermark = document.getElementById('important-ip-watermark');
+			if (ipWatermark) {
+				ipWatermark.remove();
+			}
+			
+			// 移除移动IP水印
+			const mobileIP = document.getElementById('mobile-ip-watermark');
+			if (mobileIP) {
+				mobileIP.remove();
 			}
 			
 			// 移除Canvas
