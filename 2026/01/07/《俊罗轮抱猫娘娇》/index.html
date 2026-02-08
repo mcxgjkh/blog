@@ -824,7 +824,7 @@
 				
 				// 优化样式 - 更淡，确保在屏幕内
 				const fontSize = Math.random() * 4 + 14; // 14-18px
-				const opacity = Math.random() * 0.15 + 0.115; // 0.08-0.16，更淡
+				const opacity = Math.random() * 0.15 + 0.15; // 0.08-0.16，更淡
 				const fontWeight = Math.random() > 0.7 ? '500' : '400';
 				
 				watermark.style.left = pos.left + '%';
@@ -980,11 +980,21 @@
 				for (let i = 0; i < 35; i++) {
 					const x = Math.random() * canvas.width;
 					const y = Math.random() * canvas.height;
-					const size = Math.random() * 2 + 1.2;
+					const size = Math.random() * 3 + 1.2;
 					const alpha = Math.random() * 0.12;
 					
 					ctx.fillStyle = `rgba(0,0,0,${alpha})`;
 					ctx.fillRect(x, y, size, size);
+				}
+
+				// 添加干扰线
+				if (Math.random() > 0.7) {
+					ctx.beginPath();
+					ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
+					ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height);
+					ctx.strokeStyle = `rgba(0,0,0,${Math.random() * 0.1})`;
+					ctx.lineWidth = Math.random() * 2 + 0.5;
+					ctx.stroke();
 				}
 				
 				requestAnimationFrame(animate);
@@ -1030,7 +1040,7 @@
 			}
 			
 			// 添加干扰线
-			for (let i = 0; i < 3; i++) {
+			for (let i = 0; i < 5; i++) {
 				const line = document.createElementNS(svgNS, 'line');
 				line.setAttribute('x1', Math.random() * 30);
 				line.setAttribute('y1', Math.random() * 30);
@@ -1137,7 +1147,7 @@
 		});
 		
 		
-		// =========== 原有防护代码（保持不变） ===========
+		// =========== 原有防护代码（修复版） ===========
         (function() {
 			// 密码配置
             const ADMIN_PASSWORD = "homo114514";
@@ -1379,8 +1389,8 @@
 					}
 				`;
 				document.head.appendChild(style);
-
-				// 立即绑定按钮事件
+				
+				// 绑定按钮事件
 				document.getElementById('refreshBtn').onclick = () => location.reload();
 				document.getElementById('submitBtn').onclick = checkPassword;
 				document.getElementById('adminPasswordInput').onkeypress = (e) => {
@@ -1389,7 +1399,7 @@
 				document.getElementById('adminPasswordInput').focus();
             }
             
-			// 检查密码
+			// 检查密码 - 修复版：确保停止所有防护
             function checkPassword() {
                 const input = document.getElementById('adminPasswordInput');
                 const errorDiv = document.getElementById('passwordError');
@@ -1425,6 +1435,12 @@
                     errorDiv.textContent = '✗ 密码错误';
                     input.value = '';
                     input.focus();
+                    
+                    // 添加错误动画
+                    input.style.animation = 'shake 0.5s';
+                    setTimeout(() => {
+                        input.style.animation = '';
+                    }, 500);
                 }
             }
             
@@ -1467,6 +1483,33 @@
                 e.preventDefault();
                 return false;
             });
+            
+            // 开发者工具检测
+            (function() {
+                const element = new Image();
+                Object.defineProperty(element, 'id', {
+                    get: function() {
+                        showPasswordInput();
+                        return '';
+                    }
+                });
+                console.log('%c ', element);
+            })();
+            
+            // 防调试
+            function detectDevTools() {
+                const threshold = 160;
+                const widthThreshold = window.outerWidth - window.innerWidth > threshold;
+                const heightThreshold = window.outerHeight - window.innerHeight > threshold;
+                
+                if (widthThreshold || heightThreshold) {
+                    showPasswordInput();
+                }
+            }
+            
+            // 定期检测
+            setInterval(detectDevTools, 1000);
+            window.addEventListener('resize', detectDevTools);
         })();
 
         // 兼容性处理
@@ -1508,6 +1551,21 @@
                     const event = new Event('contextmenu');
                     document.dispatchEvent(event);
                     return false;
+                }
+            });
+            
+            // 防窗口最小化检测
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden) {
+                    setTimeout(() => {
+                        if (document.hidden) {
+                            const event = new KeyboardEvent('keydown', {
+                                key: 'F12',
+                                bubbles: true
+                            });
+                            document.dispatchEvent(event);
+                        }
+                    }, 1000);
                 }
             });
         });
