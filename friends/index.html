@@ -735,6 +735,34 @@
 			console.log('防截图系统已停止');
 		}
 		
+		// =========== 修复：将preventDefault函数提取到外部作用域 ===========
+		function preventDefaultHandler(e) {
+			e.preventDefault();
+			return false;
+		}
+		
+		// 启用复制保护
+		function enableCopyProtection() {
+			// 禁用右键菜单
+			document.addEventListener('contextmenu', preventDefaultHandler);
+			
+			// 禁用选择
+			document.addEventListener('selectstart', preventDefaultHandler);
+			
+			// 禁用拖拽
+			document.addEventListener('dragstart', preventDefaultHandler);
+		}
+		
+		// 禁用复制保护
+		function disableCopyProtection() {
+			// 移除事件监听器
+			document.removeEventListener('contextmenu', preventDefaultHandler);
+			document.removeEventListener('selectstart', preventDefaultHandler);
+			document.removeEventListener('dragstart', preventDefaultHandler);
+		}
+		
+		// =========== 以上是修复部分 ===========
+		
 		// 创建优化水印层 - 确保水印在屏幕内、更淡、IP可读
 		function createOptimizedWatermarks() {
 			const container = document.createElement('div');
@@ -1024,31 +1052,6 @@
 			mixedLayer.className = 'protection-mixed-layer';
 			mixedLayer.id = 'protection-mixed-layer';
 			document.body.appendChild(mixedLayer);
-		}
-		
-		// 启用复制保护
-		function enableCopyProtection() {
-			// 禁用右键菜单
-			document.addEventListener('contextmenu', preventDefault);
-			
-			// 禁用选择
-			document.addEventListener('selectstart', preventDefault);
-			
-			// 禁用拖拽
-			document.addEventListener('dragstart', preventDefault);
-			
-			function preventDefault(e) {
-				e.preventDefault();
-				return false;
-			}
-		}
-		
-		// 禁用复制保护
-		function disableCopyProtection() {
-			// 移除事件监听器
-			document.removeEventListener('contextmenu', preventDefault);
-			document.removeEventListener('selectstart', preventDefault);
-			document.removeEventListener('dragstart', preventDefault);
 		}
 		
 		// 移除所有防护层
@@ -1371,24 +1374,20 @@
 					// 密码正确 - 设置30秒有效期
                     const expiryTime = Date.now() + (30 * 1000);
                     localStorage.setItem(PROTECTION_EXPIRY_KEY, expiryTime.toString());
-					console.log(1);
                     
 					// 立即移除文字选择限制
                     removeTextSelectionProtection();
-					console.log(2);
                     
                     // 停止防截图系统
                     if (screenshotProtectionActive) {
                         stopScreenshotProtection();
                         screenshotProtectionActive = false;
                     }
-					console.log(3);
                     
                     // 禁用输入框和按钮，防止重复点击
                     input.disabled = true;
                     document.getElementById('submitBtn').disabled = true;
                     document.getElementById('refreshBtn').disabled = true;
-					console.log(4);
                     
                     // 显示成功消息
                     errorDiv.textContent = '✓ 密码正确，正在重新加载...';
