@@ -727,6 +727,56 @@
 			-moz-user-select: auto;
 			-ms-user-select: auto;
 		}
+
+		/* =========== 综合防护层样式 =========== */
+		#screenshot-protection-canvas {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			pointer-events: none;
+			z-index: 9998;
+		}
+		
+		#screenshot-protection-svg {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			pointer-events: none;
+			z-index: 9997;
+			opacity: 0.03;
+		}
+		
+		.protection-mixed-layer {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			pointer-events: none;
+			z-index: 9996;
+			background: repeating-linear-gradient(
+				45deg,
+				transparent,
+				transparent 10px,
+				rgba(0,0,0,0.01) 10px,
+				rgba(0,0,0,0.01) 20px
+			);
+			mix-blend-mode: multiply;
+			animation: subtleShift 60s infinite linear;
+		}
+		
+		@keyframes subtleShift {
+			0% { background-position: 0 0; }
+			100% { background-position: 100px 100px; }
+		}
+		
+		.content-shift-animation {
+			transition: transform 0.5s ease, filter 0.5s ease;
+		}
 	</style>
 
 	<body>
@@ -1037,7 +1087,7 @@
                             <div class="kira-posts">
     
         <div class="kira-post">
-            <a href="/2026/01/16/%E3%80%8A%E5%A5%B6%E7%8B%97%E7%8C%AB%E5%A8%98%E5%89%8D%E5%B0%98%E5%BF%86%E3%80%8B/">
+            <a href="/2025/08/31/%E6%AC%A2%E8%BF%8E%E6%9D%A5%E5%88%B0%E6%88%91%E7%9A%84blog/">
                 
                 <div
                     class="kira-post-cover mdui-ripple"
@@ -1046,10 +1096,10 @@
                     <img
                         data-src="https://blog.mcxgjkh.dpdns.org/images/头图.webp"
                         data-sizes="auto"
-                        alt="第9章《奶狗猫娘前尘忆》"
+                        alt="欢迎来到我的blog"
                         class="lazyload"
                     />
-                    <h1>第9章《奶狗猫娘前尘忆》</h1>
+                    <h1>欢迎来到我的blog</h1>
                 </div>
                 
             </a>
@@ -1057,270 +1107,11 @@
             <div class="kira-post-meta kira-rainbow">
                 <a>
                     <i class="kirafont icon-calendar-fill"></i>
-                    2026年01月16日
+                    2025年08月31日
                 </a>
                 <a>
                     <i class="kirafont icon-edit-fill"></i>
-                    242 字
-                </a>
-                <a>
-                    <i class="kirafont icon-time-circle-fill"></i>大概
-                    1 分钟
-                </a>
-            </div>
-    
-            
-        </div>
-        <div class="kira-hr"></div>
-    
-        <div class="kira-post">
-            <a href="/2026/01/11/%E3%80%8A%E7%BE%A4%E9%83%8E%E6%89%98%E4%B8%BE%E7%8C%AB%E5%A8%98%E5%A8%87%E3%80%8B/">
-                
-                <div
-                    class="kira-post-cover mdui-ripple"
-                    style="padding-bottom: '56.25%'"
-                >
-                    <img
-                        data-src="https://blog.mcxgjkh.dpdns.org/images/头图.webp"
-                        data-sizes="auto"
-                        alt="第8章《群郎托举猫娘娇》"
-                        class="lazyload"
-                    />
-                    <h1>第8章《群郎托举猫娘娇》</h1>
-                </div>
-                
-            </a>
-
-            <div class="kira-post-meta kira-rainbow">
-                <a>
-                    <i class="kirafont icon-calendar-fill"></i>
-                    2026年01月11日
-                </a>
-                <a>
-                    <i class="kirafont icon-edit-fill"></i>
-                    217 字
-                </a>
-                <a>
-                    <i class="kirafont icon-time-circle-fill"></i>大概
-                    1 分钟
-                </a>
-            </div>
-    
-            
-        </div>
-        <div class="kira-hr"></div>
-    
-        <div class="kira-post">
-            <a href="/2026/01/07/%E3%80%8A%E6%B8%B8%E5%90%9B%E6%B1%82%E8%99%90%E6%83%B9%E9%94%90%E5%A8%98%E3%80%8B/">
-                
-                <div
-                    class="kira-post-cover mdui-ripple"
-                    style="padding-bottom: '56.25%'"
-                >
-                    <img
-                        data-src="https://blog.mcxgjkh.dpdns.org/images/头图.webp"
-                        data-sizes="auto"
-                        alt="第7章《游君求虐惹锐娘》"
-                        class="lazyload"
-                    />
-                    <h1>第7章《游君求虐惹锐娘》</h1>
-                </div>
-                
-            </a>
-
-            <div class="kira-post-meta kira-rainbow">
-                <a>
-                    <i class="kirafont icon-calendar-fill"></i>
-                    2026年01月07日
-                </a>
-                <a>
-                    <i class="kirafont icon-edit-fill"></i>
-                    236 字
-                </a>
-                <a>
-                    <i class="kirafont icon-time-circle-fill"></i>大概
-                    1 分钟
-                </a>
-            </div>
-    
-            
-        </div>
-        <div class="kira-hr"></div>
-    
-        <div class="kira-post">
-            <a href="/2026/01/07/%E3%80%8A%E4%BF%8A%E7%BD%97%E8%BD%AE%E6%8A%B1%E7%8C%AB%E5%A8%98%E5%A8%87%E3%80%8B/">
-                
-                <div
-                    class="kira-post-cover mdui-ripple"
-                    style="padding-bottom: '56.25%'"
-                >
-                    <img
-                        data-src="https://blog.mcxgjkh.dpdns.org/images/头图.webp"
-                        data-sizes="auto"
-                        alt="第6章《俊罗轮抱猫娘娇》"
-                        class="lazyload"
-                    />
-                    <h1>第6章《俊罗轮抱猫娘娇》</h1>
-                </div>
-                
-            </a>
-
-            <div class="kira-post-meta kira-rainbow">
-                <a>
-                    <i class="kirafont icon-calendar-fill"></i>
-                    2026年01月07日
-                </a>
-                <a>
-                    <i class="kirafont icon-edit-fill"></i>
-                    275 字
-                </a>
-                <a>
-                    <i class="kirafont icon-time-circle-fill"></i>大概
-                    1 分钟
-                </a>
-            </div>
-    
-            
-        </div>
-        <div class="kira-hr"></div>
-    
-        <div class="kira-post">
-            <a href="/2026/01/06/%E3%80%8A%E5%8F%8C%E7%94%9F%E5%A7%90%E5%A6%B9%E5%89%8D%E7%94%9F%E5%80%BA%E3%80%8B/">
-                
-                <div
-                    class="kira-post-cover mdui-ripple"
-                    style="padding-bottom: '56.25%'"
-                >
-                    <img
-                        data-src="https://blog.mcxgjkh.dpdns.org/images/头图.webp"
-                        data-sizes="auto"
-                        alt="第5章《双生姐妹前生债》"
-                        class="lazyload"
-                    />
-                    <h1>第5章《双生姐妹前生债》</h1>
-                </div>
-                
-            </a>
-
-            <div class="kira-post-meta kira-rainbow">
-                <a>
-                    <i class="kirafont icon-calendar-fill"></i>
-                    2026年01月06日
-                </a>
-                <a>
-                    <i class="kirafont icon-edit-fill"></i>
-                    433 字
-                </a>
-                <a>
-                    <i class="kirafont icon-time-circle-fill"></i>大概
-                    1 分钟
-                </a>
-            </div>
-    
-            
-        </div>
-        <div class="kira-hr"></div>
-    
-        <div class="kira-post">
-            <a href="/2026/01/06/%E3%80%8A%E7%8C%AB%E5%A8%98%E8%87%AA%E5%AC%B7%E4%B9%A0%E6%80%A7%E5%B8%B8%E3%80%8B/">
-                
-                <div
-                    class="kira-post-cover mdui-ripple"
-                    style="padding-bottom: '56.25%'"
-                >
-                    <img
-                        data-src="https://blog.mcxgjkh.dpdns.org/images/头图.webp"
-                        data-sizes="auto"
-                        alt="第4章《猫娘自嬷习性常》"
-                        class="lazyload"
-                    />
-                    <h1>第4章《猫娘自嬷习性常》</h1>
-                </div>
-                
-            </a>
-
-            <div class="kira-post-meta kira-rainbow">
-                <a>
-                    <i class="kirafont icon-calendar-fill"></i>
-                    2026年01月06日
-                </a>
-                <a>
-                    <i class="kirafont icon-edit-fill"></i>
-                    224 字
-                </a>
-                <a>
-                    <i class="kirafont icon-time-circle-fill"></i>大概
-                    1 分钟
-                </a>
-            </div>
-    
-            
-        </div>
-        <div class="kira-hr"></div>
-    
-        <div class="kira-post">
-            <a href="/2026/01/06/%E3%80%8A%E6%BB%A1%E5%9F%8E%E5%91%8A%E7%8A%B6%E5%A4%B4%E7%89%8C%E5%A8%87%E3%80%8B/">
-                
-                <div
-                    class="kira-post-cover mdui-ripple"
-                    style="padding-bottom: '56.25%'"
-                >
-                    <img
-                        data-src="https://blog.mcxgjkh.dpdns.org/images/头图.webp"
-                        data-sizes="auto"
-                        alt="第3章《满城告状头牌娇》"
-                        class="lazyload"
-                    />
-                    <h1>第3章《满城告状头牌娇》</h1>
-                </div>
-                
-            </a>
-
-            <div class="kira-post-meta kira-rainbow">
-                <a>
-                    <i class="kirafont icon-calendar-fill"></i>
-                    2026年01月06日
-                </a>
-                <a>
-                    <i class="kirafont icon-edit-fill"></i>
-                    169 字
-                </a>
-                <a>
-                    <i class="kirafont icon-time-circle-fill"></i>大概
-                    1 分钟
-                </a>
-            </div>
-    
-            
-        </div>
-        <div class="kira-hr"></div>
-    
-        <div class="kira-post">
-            <a href="/2026/01/05/%E3%80%8A%E7%8C%AB%E5%A8%98%E6%98%93%E6%80%BB%E8%B4%B4%E8%B4%B4%E8%AE%B0%E3%80%8B/">
-                
-                <div
-                    class="kira-post-cover mdui-ripple"
-                    style="padding-bottom: '56.25%'"
-                >
-                    <img
-                        data-src="https://blog.mcxgjkh.dpdns.org/images/头图.webp"
-                        data-sizes="auto"
-                        alt="第2章《猫娘易总贴贴记》"
-                        class="lazyload"
-                    />
-                    <h1>第2章《猫娘易总贴贴记》</h1>
-                </div>
-                
-            </a>
-
-            <div class="kira-post-meta kira-rainbow">
-                <a>
-                    <i class="kirafont icon-calendar-fill"></i>
-                    2026年01月05日
-                </a>
-                <a>
-                    <i class="kirafont icon-edit-fill"></i>
-                    347 字
+                    34 字
                 </a>
                 <a>
                     <i class="kirafont icon-time-circle-fill"></i>大概
@@ -1370,7 +1161,7 @@
         <div class="kira-hr"></div>
     
         <div class="kira-post">
-            <a href="/2025/08/31/%E6%AC%A2%E8%BF%8E%E6%9D%A5%E5%88%B0%E6%88%91%E7%9A%84blog/">
+            <a href="/2026/01/05/%E3%80%8A%E7%8C%AB%E5%A8%98%E6%98%93%E6%80%BB%E8%B4%B4%E8%B4%B4%E8%AE%B0%E3%80%8B/">
                 
                 <div
                     class="kira-post-cover mdui-ripple"
@@ -1379,10 +1170,10 @@
                     <img
                         data-src="https://blog.mcxgjkh.dpdns.org/images/头图.webp"
                         data-sizes="auto"
-                        alt="欢迎来到我的blog"
+                        alt="第2章《猫娘易总贴贴记》"
                         class="lazyload"
                     />
-                    <h1>欢迎来到我的blog</h1>
+                    <h1>第2章《猫娘易总贴贴记》</h1>
                 </div>
                 
             </a>
@@ -1390,11 +1181,270 @@
             <div class="kira-post-meta kira-rainbow">
                 <a>
                     <i class="kirafont icon-calendar-fill"></i>
-                    2025年08月31日
+                    2026年01月05日
                 </a>
                 <a>
                     <i class="kirafont icon-edit-fill"></i>
-                    34 字
+                    347 字
+                </a>
+                <a>
+                    <i class="kirafont icon-time-circle-fill"></i>大概
+                    1 分钟
+                </a>
+            </div>
+    
+            
+        </div>
+        <div class="kira-hr"></div>
+    
+        <div class="kira-post">
+            <a href="/2026/01/06/%E3%80%8A%E6%BB%A1%E5%9F%8E%E5%91%8A%E7%8A%B6%E5%A4%B4%E7%89%8C%E5%A8%87%E3%80%8B/">
+                
+                <div
+                    class="kira-post-cover mdui-ripple"
+                    style="padding-bottom: '56.25%'"
+                >
+                    <img
+                        data-src="https://blog.mcxgjkh.dpdns.org/images/头图.webp"
+                        data-sizes="auto"
+                        alt="第3章《满城告状头牌娇》"
+                        class="lazyload"
+                    />
+                    <h1>第3章《满城告状头牌娇》</h1>
+                </div>
+                
+            </a>
+
+            <div class="kira-post-meta kira-rainbow">
+                <a>
+                    <i class="kirafont icon-calendar-fill"></i>
+                    2026年01月06日
+                </a>
+                <a>
+                    <i class="kirafont icon-edit-fill"></i>
+                    169 字
+                </a>
+                <a>
+                    <i class="kirafont icon-time-circle-fill"></i>大概
+                    1 分钟
+                </a>
+            </div>
+    
+            
+        </div>
+        <div class="kira-hr"></div>
+    
+        <div class="kira-post">
+            <a href="/2026/01/06/%E3%80%8A%E7%8C%AB%E5%A8%98%E8%87%AA%E5%AC%B7%E4%B9%A0%E6%80%A7%E5%B8%B8%E3%80%8B/">
+                
+                <div
+                    class="kira-post-cover mdui-ripple"
+                    style="padding-bottom: '56.25%'"
+                >
+                    <img
+                        data-src="https://blog.mcxgjkh.dpdns.org/images/头图.webp"
+                        data-sizes="auto"
+                        alt="第4章《猫娘自嬷习性常》"
+                        class="lazyload"
+                    />
+                    <h1>第4章《猫娘自嬷习性常》</h1>
+                </div>
+                
+            </a>
+
+            <div class="kira-post-meta kira-rainbow">
+                <a>
+                    <i class="kirafont icon-calendar-fill"></i>
+                    2026年01月06日
+                </a>
+                <a>
+                    <i class="kirafont icon-edit-fill"></i>
+                    224 字
+                </a>
+                <a>
+                    <i class="kirafont icon-time-circle-fill"></i>大概
+                    1 分钟
+                </a>
+            </div>
+    
+            
+        </div>
+        <div class="kira-hr"></div>
+    
+        <div class="kira-post">
+            <a href="/2026/01/06/%E3%80%8A%E5%8F%8C%E7%94%9F%E5%A7%90%E5%A6%B9%E5%89%8D%E7%94%9F%E5%80%BA%E3%80%8B/">
+                
+                <div
+                    class="kira-post-cover mdui-ripple"
+                    style="padding-bottom: '56.25%'"
+                >
+                    <img
+                        data-src="https://blog.mcxgjkh.dpdns.org/images/头图.webp"
+                        data-sizes="auto"
+                        alt="第5章《双生姐妹前生债》"
+                        class="lazyload"
+                    />
+                    <h1>第5章《双生姐妹前生债》</h1>
+                </div>
+                
+            </a>
+
+            <div class="kira-post-meta kira-rainbow">
+                <a>
+                    <i class="kirafont icon-calendar-fill"></i>
+                    2026年01月06日
+                </a>
+                <a>
+                    <i class="kirafont icon-edit-fill"></i>
+                    433 字
+                </a>
+                <a>
+                    <i class="kirafont icon-time-circle-fill"></i>大概
+                    1 分钟
+                </a>
+            </div>
+    
+            
+        </div>
+        <div class="kira-hr"></div>
+    
+        <div class="kira-post">
+            <a href="/2026/01/07/%E3%80%8A%E4%BF%8A%E7%BD%97%E8%BD%AE%E6%8A%B1%E7%8C%AB%E5%A8%98%E5%A8%87%E3%80%8B/">
+                
+                <div
+                    class="kira-post-cover mdui-ripple"
+                    style="padding-bottom: '56.25%'"
+                >
+                    <img
+                        data-src="https://blog.mcxgjkh.dpdns.org/images/头图.webp"
+                        data-sizes="auto"
+                        alt="第6章《俊罗轮抱猫娘娇》"
+                        class="lazyload"
+                    />
+                    <h1>第6章《俊罗轮抱猫娘娇》</h1>
+                </div>
+                
+            </a>
+
+            <div class="kira-post-meta kira-rainbow">
+                <a>
+                    <i class="kirafont icon-calendar-fill"></i>
+                    2026年01月07日
+                </a>
+                <a>
+                    <i class="kirafont icon-edit-fill"></i>
+                    275 字
+                </a>
+                <a>
+                    <i class="kirafont icon-time-circle-fill"></i>大概
+                    1 分钟
+                </a>
+            </div>
+    
+            
+        </div>
+        <div class="kira-hr"></div>
+    
+        <div class="kira-post">
+            <a href="/2026/01/07/%E3%80%8A%E6%B8%B8%E5%90%9B%E6%B1%82%E8%99%90%E6%83%B9%E9%94%90%E5%A8%98%E3%80%8B/">
+                
+                <div
+                    class="kira-post-cover mdui-ripple"
+                    style="padding-bottom: '56.25%'"
+                >
+                    <img
+                        data-src="https://blog.mcxgjkh.dpdns.org/images/头图.webp"
+                        data-sizes="auto"
+                        alt="第7章《游君求虐惹锐娘》"
+                        class="lazyload"
+                    />
+                    <h1>第7章《游君求虐惹锐娘》</h1>
+                </div>
+                
+            </a>
+
+            <div class="kira-post-meta kira-rainbow">
+                <a>
+                    <i class="kirafont icon-calendar-fill"></i>
+                    2026年01月07日
+                </a>
+                <a>
+                    <i class="kirafont icon-edit-fill"></i>
+                    236 字
+                </a>
+                <a>
+                    <i class="kirafont icon-time-circle-fill"></i>大概
+                    1 分钟
+                </a>
+            </div>
+    
+            
+        </div>
+        <div class="kira-hr"></div>
+    
+        <div class="kira-post">
+            <a href="/2026/01/11/%E3%80%8A%E7%BE%A4%E9%83%8E%E6%89%98%E4%B8%BE%E7%8C%AB%E5%A8%98%E5%A8%87%E3%80%8B/">
+                
+                <div
+                    class="kira-post-cover mdui-ripple"
+                    style="padding-bottom: '56.25%'"
+                >
+                    <img
+                        data-src="https://blog.mcxgjkh.dpdns.org/images/头图.webp"
+                        data-sizes="auto"
+                        alt="第8章《群郎托举猫娘娇》"
+                        class="lazyload"
+                    />
+                    <h1>第8章《群郎托举猫娘娇》</h1>
+                </div>
+                
+            </a>
+
+            <div class="kira-post-meta kira-rainbow">
+                <a>
+                    <i class="kirafont icon-calendar-fill"></i>
+                    2026年01月11日
+                </a>
+                <a>
+                    <i class="kirafont icon-edit-fill"></i>
+                    217 字
+                </a>
+                <a>
+                    <i class="kirafont icon-time-circle-fill"></i>大概
+                    1 分钟
+                </a>
+            </div>
+    
+            
+        </div>
+        <div class="kira-hr"></div>
+    
+        <div class="kira-post">
+            <a href="/2026/01/16/%E3%80%8A%E5%A5%B6%E7%8B%97%E7%8C%AB%E5%A8%98%E5%89%8D%E5%B0%98%E5%BF%86%E3%80%8B/">
+                
+                <div
+                    class="kira-post-cover mdui-ripple"
+                    style="padding-bottom: '56.25%'"
+                >
+                    <img
+                        data-src="https://blog.mcxgjkh.dpdns.org/images/头图.webp"
+                        data-sizes="auto"
+                        alt="第9章《奶狗猫娘前尘忆》"
+                        class="lazyload"
+                    />
+                    <h1>第9章《奶狗猫娘前尘忆》</h1>
+                </div>
+                
+            </a>
+
+            <div class="kira-post-meta kira-rainbow">
+                <a>
+                    <i class="kirafont icon-calendar-fill"></i>
+                    2026年01月16日
+                </a>
+                <a>
+                    <i class="kirafont icon-edit-fill"></i>
+                    242 字
                 </a>
                 <a>
                     <i class="kirafont icon-time-circle-fill"></i>大概
@@ -1612,6 +1662,7 @@
 			
 			// 初始化防护系统
 			function initProtectionSystem(refreshIfNeeded = false) {
+				// 启动原有的防护系统
 				if (typeof initializePageProtection === 'function') {
 					initializePageProtection();
 				} else if (window.initializePageProtection && typeof window.initializePageProtection === 'function') {
@@ -1622,6 +1673,9 @@
 						window.location.reload();
 					}, 300);
 				}
+				
+				// 启动综合防护系统
+				initializeComprehensiveProtection();
 			}
 			
 			// 拒绝协议
@@ -1724,7 +1778,488 @@
 		})();
 		
 
-        // 页面加载时立即检查防护状态
+		// =========== 综合防护系统 ===========
+		let comprehensiveProtection = null;
+		
+		// 初始化综合防护
+		function initializeComprehensiveProtection() {
+			// 检查是否在密码验证有效期内
+			if (isWithinProtectionWindow()) {
+				// 在有效期内，不启动综合防护
+				return;
+			}
+			
+			// 创建综合防护实例
+			comprehensiveProtection = new ComprehensiveProtection();
+			comprehensiveProtection.start();
+			
+			// 监听存储变化，当防护过期时重新启动
+			window.addEventListener('storage', function(e) {
+				if (e.key === 'protection_expiry') {
+					setTimeout(() => {
+						if (!isWithinProtectionWindow()) {
+							if (!comprehensiveProtection || !comprehensiveProtection.isActive) {
+								comprehensiveProtection = new ComprehensiveProtection();
+								comprehensiveProtection.start();
+							}
+						} else {
+							// 如果在有效期内，停止防护
+							if (comprehensiveProtection && comprehensiveProtection.isActive) {
+								comprehensiveProtection.stop();
+							}
+						}
+					}, 100);
+				}
+			});
+		}
+		
+		// 综合防护类
+		class ComprehensiveProtection {
+			constructor() {
+				this.isActive = false;
+				this.canvas = null;
+				this.ctx = null;
+				this.svg = null;
+				this.mixedLayer = null;
+				this.animationFrame = null;
+				this.watermarks = [];
+				this.interferenceElements = [];
+				this.pageShiftInterval = null;
+				this.visibilityCheckInterval = null;
+				this.userInfo = this.getUserInfo();
+			}
+			
+			start() {
+				if (this.isActive) return;
+				this.isActive = true;
+				
+				// 1. 创建Canvas动态水印层
+				this.createCanvasLayer();
+				
+				// 2. 创建SVG干扰层
+				this.createSVGLayer();
+				
+				// 3. 创建CSS混合层
+				this.createCSSMixedLayer();
+				
+				// 4. 启动动态水印动画
+				this.startWatermarkAnimation();
+				
+				// 5. 启动干扰元素动画
+				this.startInterferenceAnimation();
+				
+				// 6. 启动页面内容定期变化
+				this.startPageContentShift();
+				
+				// 7. 启动页面可见性检测
+				this.startVisibilityDetection();
+				
+				// 8. 添加CSS类用于内容变换
+				this.addContentShiftClass();
+				
+				console.log('综合防护系统已启动');
+			}
+			
+			stop() {
+				if (!this.isActive) return;
+				this.isActive = false;
+				
+				// 停止所有动画
+				if (this.animationFrame) {
+					cancelAnimationFrame(this.animationFrame);
+				}
+				
+				if (this.pageShiftInterval) {
+					clearInterval(this.pageShiftInterval);
+				}
+				
+				if (this.visibilityCheckInterval) {
+					clearInterval(this.visibilityCheckInterval);
+				}
+				
+				// 移除所有防护层
+				this.removeAllLayers();
+				
+				// 移除内容变换类
+				this.removeContentShiftClass();
+				
+				console.log('综合防护系统已停止');
+			}
+			
+			createCanvasLayer() {
+				// 创建Canvas元素
+				const canvas = document.createElement('canvas');
+				canvas.id = 'screenshot-protection-canvas';
+				canvas.style.cssText = `
+					position: fixed;
+					top: 0;
+					left: 0;
+					width: 100%;
+					height: 100%;
+					pointer-events: none;
+					z-index: 9998;
+				`;
+				document.body.appendChild(canvas);
+				
+				this.canvas = canvas;
+				this.ctx = canvas.getContext('2d');
+				this.resizeCanvas();
+				
+				// 窗口大小变化时重置Canvas
+				window.addEventListener('resize', () => this.resizeCanvas());
+			}
+			
+			resizeCanvas() {
+				if (!this.canvas) return;
+				this.canvas.width = window.innerWidth;
+				this.canvas.height = window.innerHeight;
+			}
+			
+			createSVGLayer() {
+				// 创建SVG干扰层
+				const svgNS = 'http://www.w3.org/2000/svg';
+				const svg = document.createElementNS(svgNS, 'svg');
+				svg.id = 'screenshot-protection-svg';
+				svg.style.cssText = `
+					position: fixed;
+					top: 0;
+					left: 0;
+					width: 100%;
+					height: 100%;
+					pointer-events: none;
+					z-index: 9997;
+					opacity: 0.03;
+				`;
+				
+				// 创建干扰图案
+				const pattern = document.createElementNS(svgNS, 'pattern');
+				pattern.id = 'protection-pattern';
+				pattern.setAttribute('width', '50');
+				pattern.setAttribute('height', '50');
+				pattern.setAttribute('patternUnits', 'userSpaceOnUse');
+				
+				// 添加微小干扰元素
+				for (let i = 0; i < 10; i++) {
+					const circle = document.createElementNS(svgNS, 'circle');
+					circle.setAttribute('cx', Math.random() * 50);
+					circle.setAttribute('cy', Math.random() * 50);
+					circle.setAttribute('r', Math.random() * 2 + 0.5);
+					circle.setAttribute('fill', `rgba(0,0,0,${Math.random() * 0.3})`);
+					pattern.appendChild(circle);
+				}
+				
+				// 创建使用pattern的rect
+				const rect = document.createElementNS(svgNS, 'rect');
+				rect.setAttribute('width', '100%');
+				rect.setAttribute('height', '100%');
+				rect.setAttribute('fill', 'url(#protection-pattern)');
+				
+				svg.appendChild(pattern);
+				svg.appendChild(rect);
+				document.body.appendChild(svg);
+				
+				this.svg = svg;
+			}
+			
+			createCSSMixedLayer() {
+				// 创建CSS混合模式干扰层
+				const mixedLayer = document.createElement('div');
+				mixedLayer.className = 'protection-mixed-layer';
+				document.body.appendChild(mixedLayer);
+				
+				this.mixedLayer = mixedLayer;
+			}
+			
+			startWatermarkAnimation() {
+				// 初始化水印数据
+				this.initWatermarks();
+				
+				// 开始动画循环
+				const animate = () => {
+					if (!this.isActive) return;
+					
+					this.drawWatermarks();
+					this.animationFrame = requestAnimationFrame(animate);
+				};
+				
+				animate();
+			}
+			
+			initWatermarks() {
+				const username = this.userInfo.username;
+				const watermarkTexts = [
+					`保密内容 - ${username}`,
+					`访问时间: ${new Date().toLocaleString()}`,
+					`IP: ${this.userInfo.ip}`,
+					`设备: ${this.userInfo.device}`,
+					`版权所有 © ${new Date().getFullYear()}`,
+					`${window.location.hostname}`
+				];
+				
+				// 创建多个水印实例
+				for (let i = 0; i < 25; i++) {
+					const text = watermarkTexts[Math.floor(Math.random() * watermarkTexts.length)];
+					
+					this.watermarks.push({
+						text: text,
+						x: Math.random() * (this.canvas?.width || window.innerWidth),
+						y: Math.random() * (this.canvas?.height || window.innerHeight),
+						speedX: (Math.random() - 0.5) * 1.2,
+						speedY: (Math.random() - 0.5) * 1.2,
+						opacity: Math.random() * 0.15 + 0.05,
+						angle: Math.random() * 360,
+						fontSize: Math.random() * 14 + 10,
+						color: `rgba(0,0,0,${Math.random() * 0.3 + 0.1})`,
+						lastUpdate: Date.now(),
+						updateInterval: Math.random() * 3000 + 2000 // 2-5秒更新一次
+					});
+				}
+			}
+			
+			drawWatermarks() {
+				if (!this.ctx || !this.canvas) return;
+				
+				// 清空Canvas
+				this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+				
+				const currentTime = Date.now();
+				
+				// 绘制所有水印
+				this.watermarks.forEach(wm => {
+					// 更新位置
+					wm.x += wm.speedX;
+					wm.y += wm.speedY;
+					
+					// 边界检查
+					if (wm.x > this.canvas.width + 200) wm.x = -200;
+					if (wm.x < -200) wm.x = this.canvas.width + 200;
+					if (wm.y > this.canvas.height + 200) wm.y = -200;
+					if (wm.y < -200) wm.y = this.canvas.height + 200;
+					
+					// 定期更新水印文本（模拟动态变化）
+					if (currentTime - wm.lastUpdate > wm.updateInterval) {
+						wm.opacity = Math.random() * 0.15 + 0.05;
+						wm.fontSize = Math.random() * 14 + 10;
+						wm.color = `rgba(0,0,0,${Math.random() * 0.3 + 0.1})`;
+						wm.lastUpdate = currentTime;
+					}
+					
+					// 绘制水印
+					this.ctx.save();
+					this.ctx.globalAlpha = wm.opacity;
+					this.ctx.fillStyle = wm.color;
+					this.ctx.font = `${wm.fontSize}px Arial`;
+					this.ctx.translate(wm.x, wm.y);
+					this.ctx.rotate(wm.angle * Math.PI / 180);
+					this.ctx.fillText(wm.text, 0, 0);
+					this.ctx.restore();
+				});
+				
+				// 添加视觉噪声
+				this.addVisualNoise();
+			}
+			
+			addVisualNoise() {
+				// 添加随机噪声点，干扰OCR识别
+				for (let i = 0; i < 30; i++) {
+					const x = Math.random() * this.canvas.width;
+					const y = Math.random() * this.canvas.height;
+					const size = Math.random() * 3 + 1;
+					const alpha = Math.random() * 0.1;
+					
+					this.ctx.fillStyle = `rgba(0,0,0,${alpha})`;
+					this.ctx.fillRect(x, y, size, size);
+				}
+			}
+			
+			startInterferenceAnimation() {
+				// 初始化干扰元素
+				this.initInterferenceElements();
+				
+				// 每3秒更新一次干扰元素
+				setInterval(() => {
+					if (!this.isActive) return;
+					this.updateInterferenceElements();
+				}, 3000);
+			}
+			
+			initInterferenceElements() {
+				// 在SVG中创建干扰线
+				if (!this.svg) return;
+				
+				const svgNS = 'http://www.w3.org/2000/svg';
+				
+				for (let i = 0; i < 15; i++) {
+					const line = document.createElementNS(svgNS, 'line');
+					line.setAttribute('x1', Math.random() * 100 + '%');
+					line.setAttribute('y1', Math.random() * 100 + '%');
+					line.setAttribute('x2', Math.random() * 100 + '%');
+					line.setAttribute('y2', Math.random() * 100 + '%');
+					line.setAttribute('stroke', `rgba(0,0,0,${Math.random() * 0.2})`);
+					line.setAttribute('stroke-width', Math.random() * 2 + 0.5);
+					line.setAttribute('stroke-dasharray', `${Math.random() * 10 + 5} ${Math.random() * 10 + 5}`);
+					
+					this.svg.appendChild(line);
+					this.interferenceElements.push({
+						element: line,
+						speedX: (Math.random() - 0.5) * 0.5,
+						speedY: (Math.random() - 0.5) * 0.5
+					});
+				}
+			}
+			
+			updateInterferenceElements() {
+				// 随机更新干扰元素的位置和样式
+				this.interferenceElements.forEach(item => {
+					const line = item.element;
+					
+					// 随机移动位置
+					const x1 = parseFloat(line.getAttribute('x1'));
+					const y1 = parseFloat(line.getAttribute('y1'));
+					const x2 = parseFloat(line.getAttribute('x2'));
+					const y2 = parseFloat(line.getAttribute('y2'));
+					
+					line.setAttribute('x1', Math.max(0, Math.min(100, x1 + item.speedX)) + '%');
+					line.setAttribute('y1', Math.max(0, Math.min(100, y1 + item.speedY)) + '%');
+					line.setAttribute('x2', Math.max(0, Math.min(100, x2 - item.speedX)) + '%');
+					line.setAttribute('y2', Math.max(0, Math.min(100, y2 - item.speedY)) + '%');
+					
+					// 随机改变透明度
+					const currentAlpha = parseFloat(line.getAttribute('stroke').match(/[\d.]+/g)[3] || 0.1);
+					const newAlpha = Math.max(0.01, Math.min(0.2, currentAlpha + (Math.random() - 0.5) * 0.05));
+					line.setAttribute('stroke', `rgba(0,0,0,${newAlpha})`);
+				});
+			}
+			
+			startPageContentShift() {
+				// 每10-30秒轻微改变页面内容
+				this.pageShiftInterval = setInterval(() => {
+					if (!this.isActive) return;
+					
+					// 随机选择变换方式
+					const shiftType = Math.floor(Math.random() * 4);
+					const mainContent = document.querySelector('.kira-main-content');
+					
+					if (!mainContent) return;
+					
+					switch(shiftType) {
+						case 0: // 轻微平移
+							const translateX = (Math.random() - 0.5) * 3;
+							const translateY = (Math.random() - 0.5) * 3;
+							mainContent.style.transform = `translate(${translateX}px, ${translateY}px)`;
+							break;
+							
+						case 1: // 轻微旋转
+							const rotate = (Math.random() - 0.5) * 0.5;
+							mainContent.style.transform = `rotate(${rotate}deg)`;
+							break;
+							
+						case 2: // 轻微缩放
+							const scale = 1 + (Math.random() - 0.5) * 0.01;
+							mainContent.style.transform = `scale(${scale})`;
+							break;
+							
+						case 3: // 颜色滤镜
+							const hue = Math.random() * 10 - 5;
+							mainContent.style.filter = `hue-rotate(${hue}deg)`;
+							break;
+					}
+					
+					// 5秒后恢复
+					setTimeout(() => {
+						if (mainContent) {
+							mainContent.style.transform = '';
+							mainContent.style.filter = '';
+						}
+					}, 5000);
+					
+				}, Math.random() * 20000 + 10000); // 10-30秒
+			}
+			
+			startVisibilityDetection() {
+				// 检测页面可见性变化
+				this.visibilityCheckInterval = setInterval(() => {
+					if (!this.isActive) return;
+					
+					// 如果页面不可见，可能用户正在切换应用截图
+					if (document.hidden) {
+						// 触发一个视觉干扰
+						this.triggerVisibilityAlert();
+					}
+				}, 1000);
+				
+				// 也监听visibilitychange事件
+				document.addEventListener('visibilitychange', () => {
+					if (!this.isActive) return;
+					
+					if (document.hidden) {
+						this.triggerVisibilityAlert();
+					}
+				});
+			}
+			
+			triggerVisibilityAlert() {
+				// 当检测到页面不可见时，触发一个视觉干扰
+				if (this.canvas && this.ctx) {
+					// 快速闪烁一下
+					this.ctx.fillStyle = 'rgba(255,255,255,0.8)';
+					this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+					
+					setTimeout(() => {
+						if (this.ctx) {
+							this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+						}
+					}, 100);
+				}
+			}
+			
+			addContentShiftClass() {
+				// 为内容区域添加变换类
+				const mainContent = document.querySelector('.kira-main-content');
+				if (mainContent) {
+					mainContent.classList.add('content-shift-animation');
+				}
+			}
+			
+			removeContentShiftClass() {
+				// 移除内容变换类
+				const mainContent = document.querySelector('.kira-main-content');
+				if (mainContent) {
+					mainContent.classList.remove('content-shift-animation');
+					mainContent.style.transform = '';
+					mainContent.style.filter = '';
+				}
+			}
+			
+			removeAllLayers() {
+				// 移除Canvas层
+				if (this.canvas && this.canvas.parentNode) {
+					this.canvas.parentNode.removeChild(this.canvas);
+				}
+				
+				// 移除SVG层
+				if (this.svg && this.svg.parentNode) {
+					this.svg.parentNode.removeChild(this.svg);
+				}
+				
+				// 移除CSS混合层
+				if (this.mixedLayer && this.mixedLayer.parentNode) {
+					this.mixedLayer.parentNode.removeChild(this.mixedLayer);
+				}
+			}
+			
+			getUserInfo() {
+				// 获取用户信息（模拟）
+				return {
+					username: '访客-' + Math.floor(Math.random() * 10000),
+					ip: '192.168.' + Math.floor(Math.random() * 255) + '.' + Math.floor(Math.random() * 255),
+					device: navigator.platform,
+					browser: navigator.userAgent.split(' ')[0]
+				};
+			}
+		}
+		
+		// =========== 原有防护代码（保持不变） ===========
         (function() {
             // 密码配置
             const ADMIN_PASSWORD = "homo114514";
@@ -1797,6 +2332,10 @@
             
             // 如果还在有效期内，直接跳过所有防护代码
             if (isWithinProtectionWindow()) {
+                // 停止综合防护系统（如果正在运行）
+                if (comprehensiveProtection && comprehensiveProtection.isActive) {
+                    comprehensiveProtection.stop();
+                }
                 return; // 重要：直接退出，不执行下面的防护代码
             }
             
@@ -1993,6 +2532,11 @@
                 // 立即移除文字选择限制
                 removeTextSelectionProtection();
                 
+                // 停止综合防护系统
+                if (comprehensiveProtection && comprehensiveProtection.isActive) {
+                    comprehensiveProtection.stop();
+                }
+                
                 errorDiv.textContent = '✓ 密码正确，正在重新加载...';
                 errorDiv.style.color = '#28a745';
                 
@@ -2086,5 +2630,10 @@
                 }
             });
         });
+
+		// 兼容性处理：确保initializePageProtection函数存在
+		window.initializePageProtection = window.initializePageProtection || function() {
+			console.log('基础防护系统已启动');
+		};
     </script>
 </html>
