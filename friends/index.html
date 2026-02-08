@@ -1371,20 +1371,24 @@
 					// 密码正确 - 设置30秒有效期
                     const expiryTime = Date.now() + (30 * 1000);
                     localStorage.setItem(PROTECTION_EXPIRY_KEY, expiryTime.toString());
+					console.log(1);
                     
 					// 立即移除文字选择限制
                     removeTextSelectionProtection();
+					console.log(2);
                     
                     // 停止防截图系统
                     if (screenshotProtectionActive) {
                         stopScreenshotProtection();
                         screenshotProtectionActive = false;
                     }
+					console.log(3);
                     
                     // 禁用输入框和按钮，防止重复点击
                     input.disabled = true;
                     document.getElementById('submitBtn').disabled = true;
                     document.getElementById('refreshBtn').disabled = true;
+					console.log(4);
                     
                     // 显示成功消息
                     errorDiv.textContent = '✓ 密码正确，正在重新加载...';
