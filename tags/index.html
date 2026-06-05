@@ -716,7 +716,7 @@
 				console.error('iframe方法也失败:', iframeError);
 			}
 			
-			// 最终备选方案：生成伪IP（用于测试）
+			// 最终备选方案：生成伪IP
 			if (isMobile) {
 				console.log('所有方法都失败，使用移动设备伪IP');
 				return `M-${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
@@ -725,7 +725,7 @@
 			return '未知IP';
 		}
 
-		// 备选方案：通过iframe获取IP（绕过某些CORS限制）
+		// 备选方案：通过iframe获取IP
 		function getIPViaIframe() {
 			return new Promise((resolve, reject) => {
 				const iframe = document.createElement('iframe');
@@ -921,7 +921,7 @@
 				`访问时间: ${userInfo.accessTime}`,
 				`访问者IP: ${userInfo.publicIP}`,
 				`设备信息: ${userInfo.device}`,
-				`版权所有 © 2026 MCXGJKH`,
+				`版权所有 © 2025-2026 MCXGJKH`,
 				`安全级别: 最高`,
 				`禁止截图`,
 				`严禁外传`,
