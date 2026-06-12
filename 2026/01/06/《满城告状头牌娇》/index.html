@@ -148,7 +148,7 @@
         满城箫管尽开花
     </div>
 	<div class="kira-count">
-		<div><span>文章</span>12</div>
+		<div><span>文章</span>13</div>
 		<div><span>标签</span>2</div>
 		<div><span>分类</span>2</div>
 	</div>
@@ -278,7 +278,7 @@
             <a class="category-list-link" href="/categories/校园/">
               校园
             </a>
-            <span class="category-list-count">11</span>
+            <span class="category-list-count">12</span>
           </li>
         
       </ul>
@@ -302,7 +302,7 @@
 			文章归档
 		</h3>
 		<div class="kira-widget">
-			<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/">2026</a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/">2025</a><span class="archive-list-count">1</span></li></ul>
+			<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/">2026</a><span class="archive-list-count">12</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/">2025</a><span class="archive-list-count">1</span></li></ul>
 		</div>
 	</div>
 
@@ -406,7 +406,7 @@
 		</div>
 		<html><head></head><body><h1><span id="%E7%AC%AC3%E7%AB%A0%E6%BB%A1%E5%9F%8E%E5%91%8A%E7%8A%B6%E5%A4%B4%E7%89%8C%E5%A8%87">第3章《满城告状头牌娇》</span></h1><h3><span id="%E4%BD%9C%E8%80%85%E8%90%A8%E8%8F%87%E4%B8%81">作者：萨菇丁</span></h3><p><em>时间：2026年01月06日</em></p>
 <blockquote>
-<p><strong>本章人物对照表：</strong><br>妓院里的头牌/头牌：zrt 男<br>萨美女/萨茹丁：xzy 女<br>方方：fby 女 （九年级语文老师）</p>
+<p><strong>本章人物对照表：</strong><br>妓院里的头牌/头牌：zrt 男<br>萨美女/萨菇丁：xzy 女<br>方方：fby 女 （九年级语文老师）</p>
 </blockquote>
 <p>据9XX正史记载，于1月5日方方晚管时，某满城男子跟美女说头牌骂我呢，美女非常生气😡随即质问头牌，头牌立即拿着卷子挡着自己，只露出一双含情眼，眨巴着望向美女，娇羞道“没有”，美女看头牌这个样子也是感觉非常好笑（美女当时想到了那种举着扇子羞涩遮住自己的妃子）</p>
 </body></html>
@@ -440,7 +440,7 @@
 				<span>下一章</span>
 				<a href="/2026/01/06/%E3%80%8A%E7%8C%AB%E5%A8%98%E8%87%AA%E5%AC%B7%E4%B9%A0%E6%80%A7%E5%B8%B8%E3%80%8B/"> 第4章《猫娘自嬷习性常》</a>
 			</div>
-			                                                               
+			                                                                      
 		</nav>
 	</div>
 	
@@ -675,6 +675,54 @@
 		}
 
 		
+		// =========== Supabase 访问日志 ===========
+		const SUPABASE_URL = 'https://pxhiobmdzntnxwpwtgpx.supabase.co';
+		const SUPABASE_KEY = 'sb_publishable_qLEeWMIwuSC_R_l_wSToqg_RC9_wU8D';
+		const LOG_TABLE = 'blog_visitor_logs';
+		const DEDUP_MINUTES = 5;
+
+		async function logVisitToSupabase() {
+			const storageKey = 'last_visit_log_ts';
+			const now = Date.now();
+			const lastLog = parseInt(localStorage.getItem(storageKey) || '0');
+
+			if (now - lastLog < DEDUP_MINUTES * 60 * 1000) {
+				console.log('距上次记录不足5分钟，跳过');
+				return;
+			}
+
+			try {
+				const d = new Date();
+				const utc8 = new Date(d.getTime() + 8 * 60 * 60 * 1000);
+				const accessTimeISO = utc8.toISOString().replace('Z', '+08:00');
+
+				const res = await fetch(`${SUPABASE_URL}/rest/v1/${LOG_TABLE}`, {
+					method: 'POST',
+					headers: {
+						'apikey': SUPABASE_KEY,
+						'Authorization': `Bearer ${SUPABASE_KEY}`,
+						'Content-Type': 'application/json',
+						'Prefer': 'return=minimal'
+					},
+					body: JSON.stringify({
+						ip: userInfo.publicIP,
+						username: userInfo.username,
+						device: userInfo.device,
+						access_time: accessTimeISO
+					})
+				});
+
+				if (res.ok) {
+					localStorage.setItem(storageKey, now.toString());
+					console.log('访问记录已写入 Supabase');
+				} else {
+					console.error('写入失败:', res.status, await res.text());
+				}
+			} catch (err) {
+				console.error('Supabase 请求失败:', err);
+			}
+		}
+
 		// 初始化防截图系统
 		async function initializeScreenshotProtection() {
 			console.log('防截图系统启动中...');
@@ -731,6 +779,9 @@
 			// 启动防截图系统
 			startScreenshotProtection();
 			screenshotProtectionActive = true;
+
+			// 写入访问日志（5分钟内不重复）
+			logVisitToSupabase();
 			
 			// 监听存储变化，当防护过期时重新启动
 			window.addEventListener('storage', function(e) {

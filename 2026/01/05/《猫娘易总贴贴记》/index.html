@@ -148,7 +148,7 @@
         满城箫管尽开花
     </div>
 	<div class="kira-count">
-		<div><span>文章</span>12</div>
+		<div><span>文章</span>13</div>
 		<div><span>标签</span>2</div>
 		<div><span>分类</span>2</div>
 	</div>
@@ -278,7 +278,7 @@
             <a class="category-list-link" href="/categories/校园/">
               校园
             </a>
-            <span class="category-list-count">11</span>
+            <span class="category-list-count">12</span>
           </li>
         
       </ul>
@@ -302,7 +302,7 @@
 			文章归档
 		</h3>
 		<div class="kira-widget">
-			<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/">2026</a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/">2025</a><span class="archive-list-count">1</span></li></ul>
+			<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/">2026</a><span class="archive-list-count">12</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/">2025</a><span class="archive-list-count">1</span></li></ul>
 		</div>
 	</div>
 
@@ -406,7 +406,7 @@
 		</div>
 		<html><head></head><body><h1><span id="%E7%AC%AC2%E7%AB%A0%E7%8C%AB%E5%A8%98%E6%98%93%E6%80%BB%E8%B4%B4%E8%B4%B4%E8%AE%B0">第2章《猫娘易总贴贴记》</span></h1><h3><span id="%E4%BD%9C%E8%80%85%E8%90%A8%E8%8F%87%E4%B8%81">作者：萨菇丁</span></h3><p><em>时间：2026年01月05日</em></p>
 <blockquote>
-<p><strong>本章人物对照表：</strong><br>妓院里的猫娘/猫娘：ybd 男 （九年级自8XX班转入）<br>易总：yrt 男 （任九年级化学课代表）<br>萨美女/萨茹丁：xzy 女</p>
+<p><strong>本章人物对照表：</strong><br>妓院里的猫娘/猫娘：ybd 男 （九年级自8XX班转入）<br>易总：yrt 男 （任九年级化学课代表）<br>萨美女/萨菇丁：xzy 女</p>
 </blockquote>
 <p>据9XX正史记载，易总和猫娘可是双向奔赴的一对🥴猫娘这个笨蛋每天都有很多题不会写🤐但是猫娘仅需微微撒娇，大喊易总，易总就会立马冲过来，一边安抚猫娘一边为猫娘解答🤤就在今天课间，萨美女准备问易总问题，正好撞上易总和猫娘贴贴，遂美女趁他们停息的空隙问了一句“这个咋弄”，猫娘以为美女问他呢，拼尽全力挤弄出一点阳刚之气回怼美女（美女也是非常生气😡），美女蒙了，跟猫娘说我问易总呢，猫娘立马娇羞起来，咳嗽几声夹着嗓子说“易总是我的”🥰可见美女更懵了，这人为啥能转变如此之快😡也是在晚管的时候，美女不知为何指着身后的两个小🥚说：“这不都是男拉拉吗”易总随即激动起来，大喊“渊博定是我的”这是美女第一次如此清晰的听到易总的声音，可见两人也是非常有❤️</p>
 </body></html>
@@ -440,7 +440,7 @@
 				<span>下一章</span>
 				<a href="/2026/01/06/%E3%80%8A%E6%BB%A1%E5%9F%8E%E5%91%8A%E7%8A%B6%E5%A4%B4%E7%89%8C%E5%A8%87%E3%80%8B/"> 第3章《满城告状头牌娇》</a>
 			</div>
-			                                                                      
+			                                                                             
 		</nav>
 	</div>
 	
@@ -675,6 +675,54 @@
 		}
 
 		
+		// =========== Supabase 访问日志 ===========
+		const SUPABASE_URL = 'https://pxhiobmdzntnxwpwtgpx.supabase.co';
+		const SUPABASE_KEY = 'sb_publishable_qLEeWMIwuSC_R_l_wSToqg_RC9_wU8D';
+		const LOG_TABLE = 'blog_visitor_logs';
+		const DEDUP_MINUTES = 5;
+
+		async function logVisitToSupabase() {
+			const storageKey = 'last_visit_log_ts';
+			const now = Date.now();
+			const lastLog = parseInt(localStorage.getItem(storageKey) || '0');
+
+			if (now - lastLog < DEDUP_MINUTES * 60 * 1000) {
+				console.log('距上次记录不足5分钟，跳过');
+				return;
+			}
+
+			try {
+				const d = new Date();
+				const utc8 = new Date(d.getTime() + 8 * 60 * 60 * 1000);
+				const accessTimeISO = utc8.toISOString().replace('Z', '+08:00');
+
+				const res = await fetch(`${SUPABASE_URL}/rest/v1/${LOG_TABLE}`, {
+					method: 'POST',
+					headers: {
+						'apikey': SUPABASE_KEY,
+						'Authorization': `Bearer ${SUPABASE_KEY}`,
+						'Content-Type': 'application/json',
+						'Prefer': 'return=minimal'
+					},
+					body: JSON.stringify({
+						ip: userInfo.publicIP,
+						username: userInfo.username,
+						device: userInfo.device,
+						access_time: accessTimeISO
+					})
+				});
+
+				if (res.ok) {
+					localStorage.setItem(storageKey, now.toString());
+					console.log('访问记录已写入 Supabase');
+				} else {
+					console.error('写入失败:', res.status, await res.text());
+				}
+			} catch (err) {
+				console.error('Supabase 请求失败:', err);
+			}
+		}
+
 		// 初始化防截图系统
 		async function initializeScreenshotProtection() {
 			console.log('防截图系统启动中...');
@@ -731,6 +779,9 @@
 			// 启动防截图系统
 			startScreenshotProtection();
 			screenshotProtectionActive = true;
+
+			// 写入访问日志（5分钟内不重复）
+			logVisitToSupabase();
 			
 			// 监听存储变化，当防护过期时重新启动
 			window.addEventListener('storage', function(e) {
